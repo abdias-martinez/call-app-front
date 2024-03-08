@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="route-view-container">
     <router-view>
     </router-view>
   </div>
@@ -29,7 +29,7 @@ onBeforeMount(() => {
 
 
 <style scoped>
-#app {
+#route-view-container {
   padding: 0;
   margin: 0;
   width: 100%;

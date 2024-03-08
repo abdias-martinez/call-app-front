@@ -1,13 +1,13 @@
 <template>
     <!-- Vista de inicio de sesión  -->
-    <div class="login-view-container">
+    <div id="login-view-container">
         <!-- Contenedor del logo -->
-        <div class="logo-container">
+        <div id="logo-container">
             <img src="../../assets/images/logo.png" alt="">
         </div>
 
         <!-- Formulario de inicio de sesión -->
-        <form class="login-form">
+        <form id="login-form">
             <!-- Grupo de entrada para el nombre de usuario -->
             <div class="input-group">
                 <!-- Contenedor del ícono de usuario -->
@@ -58,7 +58,7 @@ const timeoutId = ref();
 const username = ref("")
 const password = ref("")
 const showMessageError = ref(false)
-// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO '<form class="login-form"></form>'
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO '<form id="login-form"></form>'
 const dataUser = ref({
     "username": username,
     "password": password
@@ -105,7 +105,7 @@ const login = async () => {
 </script>
 
 <style scoped>
-.login-view-container {
+#login-view-container {
     width: 30%;
     min-width: 400px;
     height: auto;
@@ -116,15 +116,15 @@ const login = async () => {
     gap: 100px;
 }
 
-.logo-container {
+#logo-container {
     height: 80px
 }
 
-.logo-container img {
+#logo-container img {
     height: 100%
 }
 
-.login-form {
+#login-form {
     width: 80%;
     display: flex;
     flex-direction: column;
