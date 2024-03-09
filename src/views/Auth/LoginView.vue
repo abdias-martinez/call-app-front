@@ -1,13 +1,13 @@
 <template>
     <!-- Vista de inicio de sesión  -->
-    <div id="login-view-container">
+    <div class="login-view-container">
         <!-- Contenedor del logo -->
-        <div id="logo-container">
+        <div class="logo-container">
             <img src="../../assets/images/logo.png" alt="">
         </div>
 
         <!-- Formulario de inicio de sesión -->
-        <form id="login-form">
+        <form class="login-form">
             <!-- Grupo de entrada para el nombre de usuario -->
             <div class="input-group">
                 <!-- Contenedor del ícono de usuario -->
@@ -105,7 +105,7 @@ const login = async () => {
 </script>
 
 <style scoped>
-#login-view-container {
+.login-view-container {
     width: 30%;
     min-width: 400px;
     height: auto;
@@ -113,28 +113,31 @@ const login = async () => {
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 100px;
+    gap: 70px;
 }
 
-#logo-container {
-    height: 80px
+.logo-container {
+    height: 55px;
+    width: auto;
+
 }
 
-#logo-container img {
-    height: 100%
+.logo-container img {
+    height: 100%;
 }
 
-#login-form {
-    width: 80%;
+.login-form {
+    height: auto;
+    width: 75%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 50px;
+    gap: 30px;
 }
 
 .input-group {
     width: 100%;
-    height: 30%;
+    height: 55px;
     background: #ffffff;
     display: flex;
     flex-direction: row;
@@ -145,25 +148,24 @@ const login = async () => {
 
 .input-group .icon-container {
     height: 100%;
-    width: 100px;
+    width: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .icon-container img {
-    height: 60px;
+    height: 80%;
 }
 
 .input-group input {
-    height: 90px;
+    height: 100%;
     width: 100%;
-    font-size: 25px;
     outline: none;
     border: none;
     padding: 0 20px 0 20px;
     background: #5d6d78;
-    font-size: 30px;
+    font-size: 22px;
     color: #ffffff;
 }
 
@@ -173,7 +175,7 @@ const login = async () => {
 
 button {
     width: 100%;
-    height: 70px;
+    height: 55px;
     outline: none;
     border: none;
     background: #11193c;
@@ -181,7 +183,7 @@ button {
     color: #ffffff;
     cursor: pointer;
     border-radius: 0.2rem 0.2rem;
-    font-size: 30px;
+    font-size: 23px;
     transition: background ease 0.3s;
 }
 
@@ -190,12 +192,12 @@ button:hover {
 }
 
 .result-message {
-    width: 400px;
+    width: 100%;
     height: 60px;
     display: flex;
     align-items: center;
     text-align: center;
-    font-size: 23px;
+    font-size: 18px;
     font-family: sans-serif;
     color: #b5c7d4
 }

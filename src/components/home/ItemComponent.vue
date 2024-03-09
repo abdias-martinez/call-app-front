@@ -32,17 +32,17 @@ const props = defineProps({
     align-items: center;
     gap: 30px;
 
-    font-size: 29px;
+    font-size: 19px;
     font-family: "Ubuntu", sans-serif;
     font-weight: 500;
     color: #34354B;
 }
 
 .data-item {
-    font-size: 25px;
-    height: 25px;
+    font-size: 21px;
+    height: 10px;
     width: auto;
-    min-width: 60px;
+    min-width: 40px;
     padding: 7px 5px;
     color: #fff;
     display: flex;

@@ -2,23 +2,43 @@
     <div class="widget-2-container">
         <div class="tittle-items-graph-container">
             <div class="tittle-items-container">
-                <div class="tittle">Estado actual postes</div>
+                <h3 class="tittle">Estado actual postes</h3>
                 <div class="items-container">
-                    <ItemComponent v-for="item, i in itemsArray" :key="i" :data="item.data" :type="item.type"
-                        :color="item.color" />
+                    <ItemComponent :data="props.active" :type="`Activo`" :color="`27AB90`" />
+                    <ItemComponent :data="props.repose" :type="`No reporta hace 3 días`" :color="`FEB05D`" />
+                    <ItemComponent :data="props.inactive" :type="`Sin reportes`" :color="`FF433D`" />
                 </div>
             </div>
             <div class="graph-container">
-                <DonutComponent :id="'1'" :timeAnimation="'0'" :arrayData="data_back" :url="''"/>
-                <DonutComponent :id="'0'" :timeAnimation="'3000'" :arrayData="data" :url="'https://res.cloudinary.com/dimcnbuqs/image/upload/v1708494958/Vector_8_eaobqg.png'"/>
+                <DonutComponent :id="'1'" :timeAnimation="'0'" :arrayData="data_back"
+                    :url="`https://res.cloudinary.com/dimcnbuqs/image/upload/v1708494958/Vector_8_eaobqg.png`" />
+
+                <DonutComponent :id="'0'" :timeAnimation="'3000'" :arrayData="data"
+                    :url="'https://res.cloudinary.com/dimcnbuqs/image/upload/v1708494958/Vector_8_eaobqg.png'" />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { defineProps } from 'vue';
 import ItemComponent from '@/components/home/ItemComponent.vue';
 import DonutComponent from '@/components/home/DonutComponent.vue';
+
+const props = defineProps({
+    active: {
+        type: String,
+        require: true
+    },
+    repose: {
+        type: String,
+        require: true
+    },
+    inactive: {
+        type: String,
+        require: true
+    },
+})
 
 interface items {
     data: string,
@@ -36,22 +56,22 @@ interface doughnut {
 
 const itemsArray: Array<items> = [
     {
-        data: '4',
+        data: props.active || '',
         type: 'Activo',
         color: '27AB90',
-        cutout: '80%'
+        cutout: '60%'
     },
     {
-        data: '4',
+        data: props.repose || '',
         type: 'No reporta hace 3 días',
         color: 'FEB05D',
-        cutout: '65%'
+        cutout: '40%'
     },
     {
-        data: '2',
+        data: props.inactive || '',
         type: 'Sin reportes',
         color: 'FF433D',
-        cutout: '56%'
+        cutout: '30%'
     }
 ]
 
@@ -66,7 +86,7 @@ const data: Array<doughnut> = itemsArray.map((item, i) => ({
     outerRadius: 0,
     borderRadius: 10,
     borderColor: 'rgba(0, 0, 0, 0)',
-    borderWidth: 20 - i * 10,
+    borderWidth: 0 - i*(20/3) ,
 }));
 
 const data_back: Array<doughnut> = itemsArray.map((item, i) => ({
@@ -77,27 +97,20 @@ const data_back: Array<doughnut> = itemsArray.map((item, i) => ({
     outerRadius: 0,
     borderRadius: 0,
     borderColor: 'rgba(0, 0, 0, 0)',
-    borderWidth: 20 - i * 10,
+    borderWidth: 0 - i*(20/3)
 }));
-
-
 
 </script>
 <style scoped>
 .widget-2-container {
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    border-radius: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: white;
+    border-radius: 16px;
+    padding: 16px 50px;
 }
 
 .tittle-items-graph-container {
-    height: 80%;
-    width: 90%;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -112,11 +125,11 @@ const data_back: Array<doughnut> = itemsArray.map((item, i) => ({
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: 30px
+    gap: 25px
 }
 
 .tittle-items-container .tittle {
-    font-size: 30px;
+    font-size: 21px;
     font-family: "Ubuntu", sans-serif;
     font-weight: 500;
     color: #34354B;
@@ -129,7 +142,7 @@ const data_back: Array<doughnut> = itemsArray.map((item, i) => ({
     flex-direction: column;
     align-items: start;
     justify-content: space-between;
-    gap: 20px
+    gap: 15px
 }
 
 .graph-container {
@@ -140,5 +153,4 @@ const data_back: Array<doughnut> = itemsArray.map((item, i) => ({
     justify-content: center;
     align-items: center;
 }
-
 </style>

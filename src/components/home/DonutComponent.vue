@@ -47,7 +47,7 @@ onMounted(() => {
                         ctx.save();
                         var image = new Image();
                         image.src = props.url;
-                        let imageSize = 35;
+                        let imageSize = 21;
                         const { top, left, width, height } = chart.chartArea;
                         const x = left + width / 2 - imageSize / 2;
                         const y = top + height / 2 - imageSize / 2;
