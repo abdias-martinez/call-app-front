@@ -391,7 +391,7 @@ onMounted(() => {
 /* estilos para el contenedor de la información del usuario  */
 .info-user-container {
     width: 90%;
-    height: 80px;
+    height: 70px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -419,7 +419,7 @@ onMounted(() => {
 .widget-data-new {
     position: relative;
     height: 100%;
-    width: 80px;
+    width: 70px;
     background: #fff;
     border-radius: 16px;
     display: flex;
@@ -427,6 +427,7 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .widget-data-new img {
@@ -437,8 +438,8 @@ onMounted(() => {
 
 .widget-data-new .data-new {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: -8px;
+    right: -8px;
     width: 32px;
     height: 32px;
     border-radius: 50%;

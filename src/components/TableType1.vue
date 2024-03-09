@@ -87,7 +87,7 @@ onBeforeMount(() => {
     columns.value = Object.keys(props.data[0])
     if (props.data.length < props.minRows) {
         numAdditionalRows.value = props.minRows - props.data.length
-        for (let i = 0; i <= numAdditionalRows.value; i++) {
+        for (let i = 0; i < numAdditionalRows.value; i++) {
             additionalRows.value.push(i + props.data.length);
         }
     }
@@ -175,7 +175,7 @@ onMounted(() => {
 }
 
 table {
-    width: 98%;
+    width: 98.9%;
     height: auto;
     border: none;
     border-spacing: 5px 0px;
@@ -189,7 +189,7 @@ thead {
     top: 0;
     z-index: 1;
     width: 100%;
-    height: 45px;
+    height: 30px;
     border-radius: 0 20px 20px 0;
     background: #070a10;
 }
@@ -197,20 +197,20 @@ thead {
 thead th {
     width: auto;
     max-width: 120px;
-    max-height: 45px;
+    height: 25px;
     background: #687FBB;
     color: #fff;
     font-family: "Baloo 2", sans-serif;
-    font-size: 25px;
+    font-size: 15px;
     font-weight: 500;
 }
 
 thead th:first-of-type {
-    border-top-left-radius: 10px;
+    border-top-left-radius: 8px;
 }
 
 thead th:last-of-type {
-    border-top-right-radius: 10px;
+    border-top-right-radius: 8px;
 }
 
 tbody {
@@ -223,13 +223,13 @@ tbody {
 .even-row {
     background: #6078bb;
     width: 100%;
-    max-height: 45px;
+    max-height: 30px;
 }
 
 .odd-row {
     background: #6078bb;
     width: 100%;
-    max-height: 45px;
+    max-height: 30px;
 }
 
 tbody tr:last-of-type td:first-of-type {
@@ -242,7 +242,8 @@ tbody tr:last-of-type td:last-of-type {
 
 td {
     width: auto;
-    height: 45px;
+    height: 30px;
+    max-height: 30px;
     text-align: center;
     padding: 0;
     overflow: hidden;
@@ -269,12 +270,12 @@ input {
     outline: none;
     width: 100%;
 
-    max-height: 45px;
+    max-height: 30px;
     background: transparent;
     padding: 0 20px 0 20px;
 
     font-family: "Baloo 2", sans-serif;
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     text-overflow: ellipsis;

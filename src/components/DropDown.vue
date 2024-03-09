@@ -85,17 +85,14 @@ onMounted(() => {
 
 .dropdown {
     position: relative;
-    height: 100%;
-    width: 100%;
-    border: 3px solid #1877F2;
-    border-radius: 10px;
+    border: 2px solid #1877F2;
+    border-radius: 8px;
     outline: none;
-    font-size: 25px;
+    font-size: 16px;
 
     display: flex;
     flex-direction: row;
     justify-content: center;
-    max-height: 47px;
 }
 
 .select {
@@ -130,8 +127,8 @@ onMounted(() => {
 }
 
 .caret img {
-    width: 25px;
-    height: 25px;
+    width: 16px;
+    height: 16px;
 }
 
 .rotate {
@@ -143,12 +140,12 @@ onMounted(() => {
     padding: 0.5em 0.5em;
     background: #fefeff;
     box-shadow: 0 10px 20px #bacee9;
-    border: 3px solid #1877F2;
-    border-radius: 20px;
+    border: 2px solid #1877F2;
+    border-radius: 12px;
     position: absolute;
-    top: 1.5em;
+    top: 2.4em;
     left: 50%;
-    width: 90%;
+    width: 89%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -160,7 +157,7 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    border-radius: 10px
+    border-radius: 5px
 }
 
 .menu-container::-webkit-scrollbar {

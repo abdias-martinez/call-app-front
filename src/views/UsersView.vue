@@ -85,7 +85,7 @@ const createInsertTable = () => {
             urls: ['https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_18_dx7tlk.png', 'https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png'],
             nameTable: 'users',
             nameObject: 'Usuarios',
-            minRows: 11,
+            minRows: 10,
             identifier: 'Usuario'
         }
         // CREAMOS UNA INSTANCIA DEL COMPONENTE 'TableType1'
@@ -105,8 +105,9 @@ const updateProfile = (newProfile: string) => {
 }
 // FUNCIONALIDAD PARA REGISTRAR UN NUEVO USUARIO
 const registerUser = async () => {
-    if (!store.state.loading) {
-        store.state.loading = true
+    if (!(store.state.blockedInputs || store.state.blockedDropdowns)) {
+        store.state.blockedInputs = true
+        store.state.blockedDropdowns = true
         const dataUserConst = dataUser.value;
         // ENVIAMOS 'dataUserConst' AL BACKEND PARA INSERTARLO EN LA TABLA 'users' DE LA BASE DE DATOS
         await store.dispatch('insertRecordTable', { "recordToInsert": dataUserConst, "nameTable": "users" });
@@ -125,12 +126,13 @@ const registerUser = async () => {
             }
             createInsertTable()
         }
-        store.state.loading = false
+        store.state.blockedInputs = false
+        store.state.blockedDropdowns = false
     }
 };
 //FUNCIONALIDAD PARA LIMPIAR LOS CAMPOS DE ENTRADA DEL FORMULARIO
 const clearDataUser = () => {
-    if (!store.state.loading) {
+    if (!(store.state.blockedInputs || store.state.blockedDropdowns)) {
         // CAMBIAMOS EL ESTADO 'shouldCleanEntries' A 'true' PARA QUE EL COMPONENTE '<DropDown/>'
         // LO DETECTE Y BORRE LA OPCIÓN QUE TIENE SELECCIONADA
         store.commit('changeShouldCleanEntries')
@@ -158,7 +160,7 @@ const clearDataUser = () => {
 }
 
 .inputs-buttons-container {
-    padding: 20px;
+    padding: 10px;
     grid-column: 1;
     grid-row: 1;
     background: #fff;
@@ -176,10 +178,10 @@ const clearDataUser = () => {
 }
 
 .input-container {
-    border: 3px solid #1877F2;
-    border-radius: 10px;
+    border: 2px solid #1877F2;
+    border-radius: 8px;
     overflow: hidden;
-    font-size: 25px;
+    font-size: 16px;
     display: flex;
     padding: 0 15px 0 15px;
     color: #5B5B5B;
@@ -236,7 +238,7 @@ const clearDataUser = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
@@ -265,8 +267,8 @@ const clearDataUser = () => {
     grid-column: 1;
     grid-row: 2;
     background: #fff;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
-    padding: 20px 0;
+    padding: 10px 0;
 }
 </style>

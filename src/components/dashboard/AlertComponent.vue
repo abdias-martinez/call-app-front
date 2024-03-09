@@ -55,14 +55,14 @@ const props = defineProps({
 
 .notification-container {
     width: auto;
-    padding: 8px 20px 8px 8px;
-    height: 47px;
-    border-radius: 19px;
+    padding: 8px 10px 8px 8px;
+    height: 30px;
+    border-radius: 16px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 12px;
     animation-name: fadeInUp;
     animation-duration: 1.5s;
     transform: translateY(50px);
@@ -86,7 +86,7 @@ const props = defineProps({
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 16px;
+    border-radius: 12px;
     overflow: hidden;
 }
 
@@ -96,7 +96,7 @@ const props = defineProps({
 }
 
 .message-container {
-    font-size: 20px;
+    font-size: 13px;
     color: #1a1818;
     width: auto;
     margin: 0;
@@ -112,8 +112,8 @@ const props = defineProps({
 }
 
 .icon-close-container {
-    height: 35px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
