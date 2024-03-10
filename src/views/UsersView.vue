@@ -4,29 +4,36 @@
         <!-- Formulario de entrada y botones -->
         <form class="inputs-buttons-container">
             <!-- Desplegable (dropdown) para seleccionar el perfil -->
-            <DropDown id="select-profile-container" :options="['administrador', 'operador']" :name="'Perfil'" :height="'auto'"
-                :identifier="'profile'" @optionIsChange="updateProfile" />
+            <DropDown id="select-profile-container" :options="['administrador', 'operador']" :name="'Perfil'"
+                :identifier="`profile`" @optionIsChange="updateProfile" />
 
             <!-- Campos de entrada para Nombres, Apellidos, Usuario y Contraseña -->
             <input class="input-container" id="input-1" type="text" placeholder="Nombres" v-model="name"
-                :disabled="store.state.blockedInputs" :class="{ 'disabled': store.state.blockedInputs }">
+                :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('names') || store.state.blocked.includes('all'))"
+                :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('names') || store.state.blocked.includes('all')) }">
+
             <input class="input-container" id="input-2" type="text" placeholder="Apellidos" v-model="lastname"
-                :disabled="store.state.blockedInputs" :class="{ 'disabled': store.state.blockedInputs }">
+                :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('lastnames') || store.state.blocked.includes('all'))"
+                :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('lastnames') || store.state.blocked.includes('all')) }">
+
             <input class="input-container" id="input-3" type="text" placeholder="Usuario" v-model="username"
-                :disabled="store.state.blockedInputs" :class="{ 'disabled': store.state.blockedInputs }">
+                :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('username') || store.state.blocked.includes('all'))"
+                :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('username') || store.state.blocked.includes('all')) }">
+
             <input class="input-container" id="input-4" type="text" placeholder="Contraseña" v-model="password"
-                :disabled="store.state.blockedInputs" :class="{ 'disabled': store.state.blockedInputs }">
+                :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('password') || store.state.blocked.includes('all'))"
+                :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('password') || store.state.blocked.includes('all')) }">
 
             <!-- Contenedor de botones -->
             <div id="buttons-container">
                 <!-- Botón guardar -->
-                <div class="button-container" id="icon-save-button" @click="registerUser">
+                <div class="button-container" id="icon-save-button" @click="registerUser" :class="{ 'disabled': store.state.isLoading }">
                     <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                         alt="icon-save-button">
                 </div>
 
                 <!-- Botón limpiar -->
-                <div class="button-container" id="icon-clear-button" @click="clearDataUser">
+                <div class="button-container" id="icon-clear-button" @click="clearDataUser" :class="{ 'disabled': store.state.isLoading }">
                     <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                         alt="icon-clear-button">
                 </div>
@@ -105,10 +112,10 @@ const updateProfile = (newProfile: string) => {
 }
 // FUNCIONALIDAD PARA REGISTRAR UN NUEVO USUARIO
 const registerUser = async () => {
-    if (!(store.state.blockedInputs || store.state.blockedDropdowns)) {
-        store.state.blockedInputs = true
-        store.state.blockedDropdowns = true
+    if (!store.state.isLoading) {
+        store.state.isLoading = true
         const dataUserConst = dataUser.value;
+        store.state.blocked = ['all']
         // ENVIAMOS 'dataUserConst' AL BACKEND PARA INSERTARLO EN LA TABLA 'users' DE LA BASE DE DATOS
         await store.dispatch('insertRecordTable', { "recordToInsert": dataUserConst, "nameTable": "users" });
         // SI EL REGISTRO SE HIZO SIN PROBLEMAS
@@ -126,16 +133,16 @@ const registerUser = async () => {
             }
             createInsertTable()
         }
-        store.state.blockedInputs = false
-        store.state.blockedDropdowns = false
+        store.state.blocked = []
+        store.state.isLoading = false
     }
 };
 //FUNCIONALIDAD PARA LIMPIAR LOS CAMPOS DE ENTRADA DEL FORMULARIO
 const clearDataUser = () => {
-    if (!(store.state.blockedInputs || store.state.blockedDropdowns)) {
-        // CAMBIAMOS EL ESTADO 'shouldCleanEntries' A 'true' PARA QUE EL COMPONENTE '<DropDown/>'
-        // LO DETECTE Y BORRE LA OPCIÓN QUE TIENE SELECCIONADA
-        store.commit('changeShouldCleanEntries')
+    if (!store.state.isLoading) {
+        // CAMBIAMOS EL ESTADO PARA QUE EL COMPONENTE '<DropDown/>' LO DETECTE Y BORRE LA OPCIÓN QUE TIENE SELECCIONADA
+        store.state.cleaned = []
+        store.state.cleaned = ['profile']
         // BORRAMOS EL VALOR DE LOS INPUTS QUE SON REFERENCIANDOS POR 'name', 'lastname', 'username', 'password'
         name.value = ''
         lastname.value = ''
@@ -148,6 +155,11 @@ const clearDataUser = () => {
 <style scoped>
 /* importamos la fuente 'Baloo 2' */
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800');
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 /* estilos para el contendor de la vista usuarios */
 .users-view-container {

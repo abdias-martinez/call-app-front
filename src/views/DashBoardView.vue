@@ -88,16 +88,16 @@
                 <!-- Widgets displaying user information -->
                 <div class="widgets-info-container">
                     <!-- Widget for notifications count -->
-                    <div class="widget-data-new">
+                    <div class="widget-data-new" @click="newNotificationSeen('call')">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708482404/Vector_2_s6mnwk.png"
                             alt="icon-new-calls">
                         <div class="data-new" style="background: #27AB90">{{ newCalls }}</div>
                     </div>
 
-                    <div class="widget-data-new">
+                    <div class="widget-data-new" @click="newNotificationSeen('message')">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708482404/Vector_3_qm18sd.png"
                             alt="icon-new-calls">
-                        <div class="data-new" style="background: #FF433D">{{ newReports }}</div>
+                        <div class="data-new" style="background: #FF433D">{{ newMessages }}</div>
                     </div>
 
                     <!-- Widget for user icon and name user -->
@@ -137,7 +137,7 @@ const userName = ref();
 const dateTimeSession = ref();
 const router = useRouter();
 const newCalls = ref(0);
-const newReports = ref(0);
+const newMessages = ref(0);
 const store = useStore();
 const alertsContainer = ref(null);
 // CONFIGURACIÓN ANTES DE MONTAR EL DASHBOARD
@@ -162,7 +162,7 @@ onBeforeMount(() => {
     const tables = localStorage.getItem('tables');
     if (tables) {
         newCalls.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["llamadas"]
-        newReports.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["mensajes"]
+        newMessages.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["mensajes"]
     }
 });
 // FUNCIONALIDAD DE CIERRE DE SESIÓN
@@ -191,6 +191,29 @@ const changeStateRemoveLastNotifiaction = () => {
     // USO DE LA FUNCION MUTATION 'serRemoveLastNotification' DEL STORE
     store.commit('setRemoveLastNotification')
 }
+
+const newNotificationSeen = async (typeWidget: string) => {
+    console.log(`Boton para marcar notificacion ${typeWidget} vista, presionada`)
+    // OBTENEMOS EL OBJETO 'table' ALMACENADO EN EL LOCAL-STORAGE
+    const tables = localStorage.getItem('tables');
+    if (tables) {
+        const tablesJSON = JSON.parse(tables)
+        const records = tablesJSON["CAE"]["Notificaciones"]["records"]
+        let originalRecord = records[0]
+        const calls = typeWidget == 'call' ? '0' : originalRecord["llamadas"]
+        const messages = typeWidget == 'message' ? '0' : originalRecord["mensajes"]
+        const editedRecord = {"llamadas": calls, "mensajes": messages}
+        const identifier = typeWidget == 'message' ? 'mensajes' : 'llamadas'
+        await store.dispatch('editRecordTable', { "editRecord": editedRecord, "originalRecord": originalRecord, "identifier": identifier, "nameTable": "notifications" })
+        tablesJSON["CAE"]["Notificaciones"]["records"] = [editedRecord];
+        // ACTUALIZAMOS EL VALOR DEL JSON 'tables' ALMACENADO EN EL LOCAL-STORAGE
+        localStorage.setItem('tables', JSON.stringify(tablesJSON));
+        
+        newCalls.value = typeWidget == 'calls' ? '0' : originalRecord["llamadas"]
+        newMessages.value = typeWidget == 'message' ? '0' : originalRecord["mensajes"]
+    }
+}
+
 // CONFIGURACIÓN NECESARIA LUEGO DE SER MONTADO EN LA APP
 onMounted(() => {
     // FUNCIONALIDAD QUE VIGILA SI HUBO ALGÚN CAMBIO EN EL ESTADO 'alertMMessage'

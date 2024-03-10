@@ -5,38 +5,44 @@
         <form class="inputs-buttons-area-container">
             <div class="inputs-buttons-container">
                 <!-- Desplegable (dropdown) para seleccionar el poste -->
-                <DropDown id="select-post-container" :options="['1', '2', '3', '4', '5']" :name="'Poste'"
-                    :identifier="'post'" :height="'129px'" @optionIsChange="updatePost" />
+                <DropDown id="select-post-container" :options="postOptions" :name="'Poste'" :identifier="`post`"
+                    @optionIsChange="updatePost" />
                 <!-- Desplegable (dropdown) para seleccionar el evento -->
-                <DropDown id="select-event-container" :options="['PRUEBAS', 'FALLA MECÁNICA', 'ACCIDENTE']" :name="'Evento'"
-                    :identifier="'event'" :height="'auto'" @optionIsChange="updateEvent" />
+                <DropDown id="select-event-container" :options="eventOptions" :name="'Evento'" :identifier="'event'"
+                    @optionIsChange="updateEvent" />
+
                 <!-- Desplegable (dropdown) para seleccionar el derivado -->
-                <DropDown id="select-derived-container" :options="['NO', 'OP GRUA', 'BOMBEROS']" :name="'Derivado'"
-                    :identifier="'derived'" :height="'auto'" @optionIsChange="updateDerived" />
+                <DropDown id="select-derived-container" :options="derivedOptions" :name="'Derivado'"
+                    :identifier="'derived'" @optionIsChange="updateDerived" />
+
                 <!-- Desplegable (dropdown) para seleccionar el vehículo -->
-                <DropDown id="select-vehicle-container" :options="['NO', 'CAMIÓN', 'AUTO']" :name="'Vehículo'"
-                    :identifier="'vehicle'" :height="'auto'" @optionIsChange="updateVehicle" />
+                <DropDown id="select-vehicle-container" :options="vehicleOptions" :name="'Vehículo'"
+                    :identifier="'vehicle'" @optionIsChange="updateVehicle" />
+
                 <!-- Desplegable (dropdown) para seleccionar presencia de personas -->
-                <DropDown id="select-persons-container" :options="['SI', 'NO']" :name="'Personas'" :height="'auto'"
+                <DropDown id="select-persons-container" :options="personsOptions" :name="'Personas'"
                     :identifier="'persons'" @optionIsChange="updatePersons" />
 
                 <!-- Contenedor de botones -->
                 <div id="buttons-container">
                     <!-- Botón guardar -->
-                    <div class="button-container" id="icon-save-button" @click="registerEvent">
+                    <div class="button-container" id="icon-save-button" @click="registerEvent"
+                        :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="button-container" id="icon-clear-button" @click="clearDataEvent">
+                    <div class="button-container" id="icon-clear-button" @click="clearDataEvent"
+                        :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
                     </div>
                 </div>
             </div>
             <textarea class="description-container" placeholder="DESCRIPCIÓN:" v-model="description"
-                :class="{ 'disabled': store.state.loading }"></textarea>
+                :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('description') || store.state.blocked.includes('all'))"
+                :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('description') || store.state.blocked.includes('all')) }"></textarea>
         </form>
 
         <!-- Contenedor de tabla de eventos -->
@@ -50,7 +56,7 @@
 // IMPORTACIONES NECESARIAS
 import DropDown from '@/components/DropDown.vue'
 import TableType1 from '@/components/TableType1.vue'
-import { ref, onMounted, createApp, watch } from 'vue'
+import { ref, onMounted, createApp, watch, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 // DEFINICIÓN DE CONSTANTES
 const store = useStore()
@@ -62,6 +68,13 @@ const vehicle = ref('')
 const persons = ref('')
 const description = ref('')
 const table = ref()
+
+const postOptions = ref<string[]>([])
+const eventOptions = ref<string[]>([])
+const derivedOptions = ref<string[]>([])
+const vehicleOptions = ref<string[]>([])
+const personsOptions = ref<string[]>([])
+
 // DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO '<form class="inputs-buttons-area-container"></form>'
 const dataEvent = ref({
     'Fecha': date,
@@ -71,6 +84,48 @@ const dataEvent = ref({
     "Vehiculo": vehicle,
     "Personas": persons,
     "Descripcion": description
+})
+
+onBeforeMount(() => {
+    // OBTENEMOS EL OBJETO 'tables' DEL LOCAL-STORAGE
+    const tables = localStorage.getItem('tables')
+    // SI EL OBJETO EXISTE
+    if (tables) {
+        const posts: string[] = []
+        const events: string[] = []
+        const derived: string[] = []
+        const vehicle: string[] = []
+        const persons: string[] = []
+        JSON.parse(tables)["CAE"]["Registro_Poste"]["records"].forEach((record: {num_poste: string}) => {
+            if (!posts.includes(record['num_poste']) && record['num_poste'] !== '') {
+                posts.push(record['num_poste'])
+            }
+        })
+        JSON.parse(tables)["CAE"]["Opciones_Eventos"]["records"].forEach((record: {Evento: string, Derivado: string, Vehiculo: string, Personas: string}) => {
+            if (!events.includes(record['Evento']) && record['Evento'] !== '') {
+                events.push(record['Evento'])
+            }
+            if (!derived.includes(record['Derivado']) && record['Derivado'] !== '') {
+                derived.push(record['Derivado'])
+            }
+            if (!vehicle.includes(record['Vehiculo']) && record['Vehiculo'] !== '') {
+                vehicle.push(record['Vehiculo'])
+            }
+            if (!persons.includes(record['Personas']) && record['Personas'] !== '') {
+                persons.push(record['Personas'])
+            }
+        })
+        postOptions.value = posts.sort()
+        eventOptions.value = events
+        derivedOptions.value = derived
+        vehicleOptions.value = vehicle
+        personsOptions.value = persons
+
+        console.log(eventOptions.value)
+        console.log(derivedOptions.value)
+        console.log(vehicleOptions.value)
+        console.log(personsOptions.value)
+    }
 })
 onMounted(() => {
     // CREAMOS Y MONTAMOS EL COMPONENTE 'TableType1' EN '<div class="table-events-container"></div>'
@@ -130,8 +185,9 @@ const updatePersons = (newPersons: string) => {
 }
 // FUNCIONALIDAD PARA REGISTRAR UN NUEVO EVENTO
 const registerEvent = async () => {
-    if (!store.state.loading) {
-        store.state.loading = true
+    if (!store.state.isLoading) {
+        store.state.isLoading = true
+        store.state.blocked = ['post', 'event', 'derived', 'vehicle', 'persons', 'description', 'all']
         date.value = obtainDateTimeRegister()
         const dataEventConst = dataEvent.value;
         // ENVIAMOS 'dataEventConst' AL BACKEND PARA INSERTARLO EN LA TABLA 'events' DE LA BASE DE DATOS
@@ -151,15 +207,16 @@ const registerEvent = async () => {
             }
             createInsertTable()
         }
-        store.state.loading = false
+        store.state.blocked = []
+        store.state.isLoading = false
     }
 }
 //FUNCIONALIDAD PARA LIMPIAR LOS CAMPOS DE ENTRADA DEL FORMULARIO
 const clearDataEvent = () => {
     if (!store.state.loading) {
-        // CAMBIAMOS EL ESTADO 'shouldCleanEntries' A 'true' PARA QUE LOS COMPONENTES '<DropDown/>'
-        // LO DETECTEN Y BORREN LA OPCIÓN QUE TIENEN SELECCIONADA
-        store.commit('changeShouldCleanEntries')
+        // CAMBIAMOS EL ESTADO PARA QUE EL COMPONENTE '<DropDown/>' LO DETECTE Y BORRE LA OPCIÓN QUE TIENE SELECCIONADA
+        store.state.cleaned = []
+        store.state.cleaned = ['post', 'event', 'derived', 'vehicle', 'persons']
 
         date.value = ''
         post.value = ''

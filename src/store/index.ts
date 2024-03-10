@@ -7,15 +7,15 @@ const store = createStore({
     isLoggedIn: true,
     errorLogin: false,
     loading: false,
-    blockedDropdowns: false,
-    blockedInputs: false,
-    blockedButtons: false,
-    typeUser: '',
+    blocked: [],
+    cleaned: [],
+    isLoading: false,
+    //typeUser: '',
     shouldCleanEntries: false,
     alertMessage: {},
     rowDeleteEdit: false,
     removeLastNotification: false,
-    dataTables: {} as Record<string, object>,
+    //dataTables: {} as Record<string, object>,
   },
   getters: {
   },
@@ -49,18 +49,6 @@ const store = createStore({
       state.removeLastNotification = !state.removeLastNotification
       console.log(`removeLastNotification ha sido cambiado a: ${state.removeLastNotification}`)
     },
-
-    startBlocking(state) {
-      state.blockedInputs = true
-      state.blockedDropdowns = true
-      state.blockedButtons = true
-    },
-
-    endBlocking(state) {
-      state.blockedInputs = true
-      state.blockedDropdowns = true
-      state.blockedButtons = true
-    }
 
   },
   actions: {
@@ -208,7 +196,9 @@ const store = createStore({
           if (response.ok) {
             const responseData = await response.json();
             console.log('Respuesta del servidor:', responseData);
-            context.commit('setAlertMessage', responseData)
+            if (nameTable !== 'notifications') {
+              context.commit('setAlertMessage', responseData)
+            }
           } else {
             console.error('Error en la respuesta del servidor:', response.status, response.statusText);
           }

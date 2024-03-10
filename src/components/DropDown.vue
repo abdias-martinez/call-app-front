@@ -1,12 +1,12 @@
 <template>
-    <div class="dropdown" :class="{ 'disabled': store.state.blockedDropdowns }">
+    <div class="dropdown" :class="{ 'disabled': isBlocked }">
         <div class="select" @click='selectClicked'>
             <span class="selected">{{ optionSelect }}</span>
             <div class="caret" :class="{ 'rotate': menuOpen }">
                 <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708632464/Vector_15_pgdeaa.png" alt="">
             </div>
         </div>
-        <ul class="menu" v-if="menuOpen" :style="{ height: `${props.height}` }">
+        <ul class="menu" v-if="menuOpen" :style="{ height: heightMenu }">
             <div class="menu-container">
                 <li v-for="option, i in options" :key="i" @click="optionChange(option), optionSelected(option)">
                     {{ option }}
@@ -17,9 +17,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref, defineProps, defineEmits, watch } from 'vue';
+import { onMounted, ref, defineProps, defineEmits, watch, onBeforeMount } from 'vue';
 import { useStore } from 'vuex';
 
+const isBlocked = ref(false)
 const store = useStore();
 const props = defineProps({
     options: {
@@ -31,10 +32,6 @@ const props = defineProps({
         require: true
     },
     identifier: {
-        type: String,
-        require: true
-    },
-    height: {
         type: String,
         require: true
     }
@@ -52,7 +49,9 @@ const menuOpen = ref(false);
 const optionSelect = ref(props.name);
 
 const selectClicked = () => {
-    menuOpen.value = !menuOpen.value;
+    if (!isBlocked.value) {
+        menuOpen.value = !menuOpen.value;
+    }
 }
 
 const optionSelected = (option) => {
@@ -63,6 +62,13 @@ const clearSelection = () => {
     optionSelect.value = props.name;
 };
 
+const heightMenu = ref('')
+
+onBeforeMount(() => {
+    heightMenu.value = props.options.length < 3 ? 'auto': '96px'
+    console.log(`dropdwon-${props.identifier}-heigth: ${heightMenu.value}`)
+})
+
 onMounted(() => {
     document.addEventListener('click', (event) => {
         const dropdown = document.getElementById(`select-${props.identifier}-container`);
@@ -71,9 +77,23 @@ onMounted(() => {
         }
     });
 
-    watch(() => store.state.shouldCleanEntries, () => {
-        clearSelection();
+    watch(() => store.state.cleaned, () => {
+        if (Array.isArray(store.state.cleaned) && store.state.cleaned.includes(props.identifier)) {
+            clearSelection();
+        }
     });
+
+    watch(() => store.state.blocked, () => {
+        if (Array.isArray(store.state.blocked) && (store.state.blocked.includes(props.identifier) || store.state.blocked.includes('all'))) {
+            isBlocked.value = true
+        } else {
+            isBlocked.value = false
+        }
+    });
+
+    watch(() => props.options, () => {
+        heightMenu.value = props.options.length < 3 ? 'auto': '96px'
+    })
 });
 </script>
 
