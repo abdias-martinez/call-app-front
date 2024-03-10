@@ -6,16 +6,16 @@
             <div class="inputs-buttons-container">
                 <!-- Desplegable (dropdown) para seleccionar el poste -->
                 <DropDown id="select-post-container" :options="['1', '2', '3', '4', '5']" :name="'Poste'"
-                    :identifier="'post'" :height="'149px'" @optionIsChange="updatePost" />
+                    :identifier="'post'" :height="'129px'" @optionIsChange="updatePost" />
                 <!-- Desplegable (dropdown) para seleccionar el evento -->
                 <DropDown id="select-event-container" :options="['PRUEBAS', 'FALLA MECÁNICA', 'ACCIDENTE']" :name="'Evento'"
-                    :identifier="'event'" :height="'149px'" @optionIsChange="updateEvent" />
+                    :identifier="'event'" :height="'auto'" @optionIsChange="updateEvent" />
                 <!-- Desplegable (dropdown) para seleccionar el derivado -->
                 <DropDown id="select-derived-container" :options="['NO', 'OP GRUA', 'BOMBEROS']" :name="'Derivado'"
-                    :identifier="'derived'" :height="'149px'" @optionIsChange="updateDerived" />
+                    :identifier="'derived'" :height="'auto'" @optionIsChange="updateDerived" />
                 <!-- Desplegable (dropdown) para seleccionar el vehículo -->
                 <DropDown id="select-vehicle-container" :options="['NO', 'CAMIÓN', 'AUTO']" :name="'Vehículo'"
-                    :identifier="'vehicle'" :height="'149px'" @optionIsChange="updateVehicle" />
+                    :identifier="'vehicle'" :height="'auto'" @optionIsChange="updateVehicle" />
                 <!-- Desplegable (dropdown) para seleccionar presencia de personas -->
                 <DropDown id="select-persons-container" :options="['SI', 'NO']" :name="'Personas'" :height="'auto'"
                     :identifier="'persons'" @optionIsChange="updatePersons" />
@@ -198,20 +198,20 @@ const obtainDateTimeRegister = () => {
     height: 100%;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 0.4fr 1fr;
+    grid-template-rows: 0.2fr 1fr;
     gap: 40px;
 }
 
 .inputs-buttons-area-container {
-    padding: 20px;
+    padding: 10px;
     grid-column: 1;
     grid-row: 1;
     background: #fff;
     border-radius: 10px;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 0.2fr 1fr;
-    gap: 20px;
+    grid-template-rows: 0.1fr 1fr;
+    gap: 10px;
 }
 
 .inputs-buttons-container {
@@ -220,7 +220,7 @@ const obtainDateTimeRegister = () => {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: 1fr;
-    gap: 20px;
+    gap: 10px;
     font-family: "Baloo 2", sans-serif;
     font-size: 25px;
 }
@@ -251,14 +251,15 @@ const obtainDateTimeRegister = () => {
 }
 
 #buttons-container {
-    height: 51px;
+    height: 35.8px;
+    width: auto;
     grid-column: 6;
     grid-row: 1;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 10px;
 }
 
 .button-container {
@@ -267,7 +268,7 @@ const obtainDateTimeRegister = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
@@ -294,14 +295,14 @@ const obtainDateTimeRegister = () => {
 
 .description-container {
     appearance: none;
-    border: 3px solid #1877F2;
+    border: 2px solid #1877F2;
     outline: none;
     grid-column: 1;
     grid-row: 2;
-    padding: 5px 15px;
-    border-radius: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
     font-family: "Baloo 2", sans-serif;
-    font-size: 25px;
+    font-size: 16px;
     resize: none;
 }
 
@@ -323,8 +324,8 @@ const obtainDateTimeRegister = () => {
     grid-column: 1;
     grid-row: 2;
     background: #fff;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
-    padding: 20px 0;
+    padding: 10px 0;
 }
 </style>

@@ -91,13 +91,13 @@
                     <div class="widget-data-new">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708482404/Vector_2_s6mnwk.png"
                             alt="icon-new-calls">
-                        <div class="data-new" style="background: #27AB90">{{ 4 }}</div>
+                        <div class="data-new" style="background: #27AB90">{{ newCalls }}</div>
                     </div>
 
                     <div class="widget-data-new">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708482404/Vector_3_qm18sd.png"
                             alt="icon-new-calls">
-                        <div class="data-new" style="background: #FF433D">{{ 2 }}</div>
+                        <div class="data-new" style="background: #FF433D">{{ newReports }}</div>
                     </div>
 
                     <!-- Widget for user icon and name user -->
@@ -136,6 +136,8 @@ const userRole = ref();
 const userName = ref();
 const dateTimeSession = ref();
 const router = useRouter();
+const newCalls = ref(0);
+const newReports = ref(0);
 const store = useStore();
 const alertsContainer = ref(null);
 // CONFIGURACIÓN ANTES DE MONTAR EL DASHBOARD
@@ -156,6 +158,12 @@ onBeforeMount(() => {
     }
     // OBTENEMOS LA HORA Y FECHA ALMACENADA EN EL LOCAL-STORAGE, PARA MOSTRARLO EN EL DASHBOARD
     dateTimeSession.value = localStorage.getItem('dateTimeSession');
+    // OBTENEMOS EL OBJETO 'table' ALMACENADO EN EL LOCAL-STORAGE
+    const tables = localStorage.getItem('tables');
+    if (tables) {
+        newCalls.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["llamadas"]
+        newReports.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["mensajes"]
+    }
 });
 // FUNCIONALIDAD DE CIERRE DE SESIÓN
 const logout = () => {

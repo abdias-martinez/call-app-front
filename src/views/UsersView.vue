@@ -168,13 +168,12 @@ const clearDataUser = () => {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: 1fr;
-    gap: 20px;
+    gap: 10px;
 }
 
 #select-profile-container {
     grid-column: 1;
     grid-row: 1;
-    font-family: "Baloo 2", sans-serif;
 }
 
 .input-container {
@@ -229,7 +228,7 @@ const clearDataUser = () => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 10px;
 }
 
 .button-container {

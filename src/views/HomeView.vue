@@ -2,11 +2,20 @@
   <!-- Vista de inicio -->
   <div class="home-view-container">
     <!-- Widgets de tipo 1 -->
-    <WidgetType1 v-for="widget1, i in widgets1" :key="i" :id="`widget-1-${i}`" :url="widget1.url" :color="widget1.color"
-      :name="widget1.name" :tittle="widget1.tittle" :month="widget1.month" :data="widget1.data" />
+    <WidgetType1 :url="`https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/Vector_rluzyd.png`"
+      :color="`FF7556`" :name="`iconCall`" :tittle="`Total llamadas`" :month="months[actualMonth - 1]"
+      :data="totalMonthCalls" />
+    <WidgetType1 :url="`https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/message-alert-outline_lftjoy.png`"
+      :color="`39A1EA`" :name="`iconReport`" :tittle="`Total reportes`" :month="months[actualMonth - 1]"
+      :data="totalMonthReports" />
+    <WidgetType1 :url="`https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/Vector_1_ygwnv8.png`"
+      :color="`27AB90`" :name="`iconPost`" :tittle="`Total postes`" :month="``" :data="totalPosts" />
 
-    <WidgetType2 id="widget-2" :active="`2`" :repose="`4`" :inactive="`7`"/>
+    <!-- Widgets de tipo 2 -->
+    <WidgetType2 id="widget-2" :active="activePosts.toString()" :repose="reposePosts.toString()"
+      :inactive="inactivePosts.toString()" />
 
+    <!-- Widgets de tipo 3 -->
     <div id="widget-3">
       <div class="icon-title-container">
         <div class="icon-container">
@@ -20,44 +29,94 @@
 
 <script lang="ts" setup>
 // IMPORTACIONES NECESARIAS
+import { ref, onBeforeMount } from 'vue'
 import WidgetType1 from '@/components/home/WidgetType1.vue'
 import WidgetType2 from '@/components/home/WidgetType2.vue'
-// DEFINICIÓN DE INTERFAZ NECESARIA
-interface widget1 {
-  url: string,
-  color: string,
-  name: string,
-  tittle: string,
-  month: string,
-  data: string
-}
-// DEFINICIÓN DE ARREGLO USADO PARA LLENAR DATOS DE LOS WIDGETS DE TIPO 1, 2 Y 3
-const widgets1: Array<widget1> = [
-  {
-    url: "https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/Vector_rluzyd.png",
-    color: "FF7556",
-    name: "iconPhone",
-    tittle: "Total llamadas",
-    month: "Enero",
-    data: "150"
-  },
-  {
-    url: "https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/message-alert-outline_lftjoy.png",
-    color: "39A1EA",
-    name: "iconMessage",
-    tittle: "Total reportes",
-    month: "Enero",
-    data: "30"
-  },
-  {
-    url: "https://res.cloudinary.com/dimcnbuqs/image/upload/v1708224703/Vector_1_ygwnv8.png",
-    color: "27AB90",
-    name: "iconDevice",
-    tittle: "Total postes",
-    month: "",
-    data: "50"
-  },
-]
+
+const totalMonthCalls = ref(0);
+const totalMonthReports = ref(0);
+const totalPosts = ref(0);
+const actualMonth = ref();
+const months = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
+const activePosts = ref(0);
+const reposePosts = ref(0);
+const inactivePosts = ref(0);
+
+onBeforeMount(() => {
+  const tables = localStorage.getItem('tables')
+  if (tables) {
+    console.log('Before sortPostsActualState');
+    sortPostsActualState(tables);
+    console.log('After sortPostsActualState');
+
+    totalMonthCalls.value = countRecordActualMonth(JSON.parse(tables)["CAE"]["Reporte_llamadas"])
+    totalMonthReports.value = countRecordActualMonth(JSON.parse(tables)["CAE"]["Reporte_postes"])
+    totalPosts.value = JSON.parse(tables)["CAE"]["Registro_Poste"]["records"].length
+    const tablesUpdate = localStorage.getItem('tables')
+    if (tablesUpdate) {
+      const records = JSON.parse(tablesUpdate)["CAE"]["Reporte_actual_postes"]["records"];
+      activePosts.value = records.filter((record: { color: string }) => record['color'] === '27AB90').length
+      reposePosts.value = records.filter((record: { color: string }) => record['color'] === 'FEB557').length
+      inactivePosts.value = records.filter((record: { color: string }) => record['color'] === 'FF433D').length
+    }
+  }
+})
+
+const countRecordActualMonth = (data: { table_name: string; records: object[] }): number => {
+  const date = new Date();
+  actualMonth.value = date.getMonth() + 1;
+  const actualYear = date.getFullYear();
+  const recordsActualMonth = data.records.filter((record: { fecha_sms?: string; fecha?: string }) => {
+    const dateString = record.fecha_sms || record.fecha;
+    const recordDate = dateString ? new Date(dateString) : null;
+    if (recordDate) {
+      const recordMonth = recordDate.getMonth() + 1;
+      const recordYear = recordDate.getFullYear();
+      return recordMonth === actualMonth.value && recordYear === actualYear;
+    }
+    return false;
+  });
+  return recordsActualMonth.length > 0 ? recordsActualMonth.length : 0;
+};
+const dateCompare = (object1: { fecha_llamada: string }, object2: { fecha_llamada: string }): number => {
+  const date1 = new Date(object1["fecha_llamada"]);
+  const date2 = new Date(object2["fecha_llamada"]);
+  return date2.getTime() - date1.getTime();
+};
+
+const sortPostsActualState = (tables: string): void => {
+  try {
+    console.log('Received tables:', tables);
+    const tablesObject = JSON.parse(tables);
+    const reporteActualPostes = tablesObject?.CAE?.Reporte_actual_postes
+    if (reporteActualPostes && Array.isArray(reporteActualPostes["records"])) {
+      const records = reporteActualPostes["records"]
+      records.sort(dateCompare)
+      const actualDate = new Date();
+      records.forEach((record: { fecha_llamada: string, color: string }) => {
+        const dateRecord = new Date(record["fecha_llamada"]);
+        const difference = actualDate.getTime() - dateRecord.getTime();
+        const differenceDays = Math.floor(difference / (1000 * 60 * 60 * 24))
+        if (differenceDays == 0) {
+          record["color"] = '27AB90';
+        } else if (differenceDays <= 3) {
+          record["color"] = 'FEB557';
+        } else {
+          record["color"] = 'FF433D';
+        }
+      })
+      localStorage.setItem('tables', JSON.stringify(tablesObject));
+    } else {
+      console.error('Invalid or missing "Reporte_actual_postes" table or records property.');
+    }
+  } catch (error) {
+    console.error('Error parsing JSON or processing data:', error);
+  }
+};
 </script>
 
 <style scoped>

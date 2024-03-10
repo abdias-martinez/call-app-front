@@ -41,7 +41,7 @@ const props = defineProps({
         require: false
     },
     data: {
-        type: String,
+        type: Number,
         require: true
     }
 })

@@ -88,7 +88,6 @@ onMounted(() => {
     border: 2px solid #1877F2;
     border-radius: 8px;
     outline: none;
-    font-size: 16px;
 
     display: flex;
     flex-direction: row;
@@ -96,7 +95,6 @@ onMounted(() => {
 }
 
 .select {
-    color: #5B5B5B;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -105,10 +103,13 @@ onMounted(() => {
 }
 
 .selected {
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    color: #5B5B5B;
     white-space: nowrap;
     max-width: 75%;
     height: 100%;
-    padding: 0 0 0 15px;
+    padding: 0 0 0 10px;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -136,10 +137,13 @@ onMounted(() => {
 }
 
 .menu {
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    color: #5B5B5B;
     list-style: none;
     padding: 0.5em 0.5em;
     background: #fefeff;
-    box-shadow: 0 10px 20px #bacee9;
+    box-shadow: 0 10px 20px #383838;
     border: 2px solid #1877F2;
     border-radius: 12px;
     position: absolute;

@@ -22,15 +22,15 @@
                 :name="'Audio disponible'" :height="'149px'" :identifier="'audio'" @optionIsChange="updateAudio" />
 
             <!-- Botón guardar -->
-            <div class="button-container" id="icon-save-button">
+            <div class="button-container" id="icon-play-button">
                 <h3>Reproducir grabación</h3>
-                <img src="../assets/images/icon-play.png" alt="icon-save-button">
+                <img src="../assets/images/icon-play.png" alt="icon-play-button">
             </div>
 
             <!-- Botón limpiar -->
-            <div class="button-container" id="icon-clear-button">
+            <div class="button-container" id="icon-export-button">
                 <h3>Exportar reporte</h3>
-                <img src="../assets/images/icon-export.png" alt="icon-clear-button">
+                <img src="../assets/images/icon-export.png" alt="icon-export-button">
             </div>
         </form>
 
@@ -44,15 +44,30 @@
 <script lang="ts" setup>
 // IMPORTACIONES NECESARIAS
 import DropDown from '@/components/DropDown.vue'
-//import TableType2 from '@/components/TableType2.vue'
+import TableType2 from '@/components/TableType2.vue'
 import TableType3 from '@/components/TableType3.vue'
-import { ref, createApp, watch } from 'vue'
+import { ref, createApp, watch, onBeforeMount, onMounted } from 'vue'
 // DEFINICIÓN DE CONSTANTES
 const report = ref()
 const date = ref()
 const post = ref()
 const audio = ref()
 const table = ref()
+const tables = ref()
+const postsTable = ref()
+const actualPostTable = ref()
+const callsTable = ref()
+
+onBeforeMount(() => {
+    const tablesJSON = localStorage.getItem('tables')
+    if (tablesJSON) {
+        tables.value = tablesJSON
+
+        postsTable.value = JSON.parse(tables.value)["CAE"]["Reporte_postes"]["records"]
+        actualPostTable.value = JSON.parse(tables.value)["CAE"]["Reporte_actual_postes"]["records"]
+        callsTable.value = JSON.parse(tables.value)["CAE"]["Reporte_llamadas"]["records"]
+    }
+})
 // FUNCIONALIDAD PARA ACTUALIZAR EL VALOR DE 'report.value'
 const updateReportType = (newReport: string) => {
     report.value = newReport
@@ -69,20 +84,15 @@ const updatePost = (newPost: string) => {
 const updateAudio = (newAudio: string) => {
     audio.value = newAudio
 }
-const createInsertTableType3 = (colorHead: string) => {
-    // OBTENEMOS EL OBJETO 'tables' DEL LOCAL-STORAGE
-    const tables = localStorage.getItem('tables')
+const createInsertTableType3 = (colorHead: string, tableData: object) => {
     // SI EL OBJETO EXISTE
-    if (tables) {
-        const tablaPrueba = JSON.parse(tables)["POSTES"]["POSTES_REPORTES_ESTADO"]["records"]  
+    if (tableData) {
         const propsData = {
-            data: tablaPrueba,
-            nameTable: 'reportes',
-            nameObject: 'Reportes',
-            minRows: 11,
+            data: tableData,
+            minRows: 9,
             color: colorHead,
         }
-        // CREAMOS UNA INSTANCIA DEL COMPONENTE 'TableType1'
+        // CREAMOS UNA INSTANCIA DEL COMPONENTE 'TableType3'
         const newTable = createApp(TableType3, propsData)
         console.log(`newTable: ${newTable}`)
         // SI EL ELEMENTO '<div class="table-reports-container"></div>' AL QUE 'table' HACE REFERENCIA, EXISTE 
@@ -93,16 +103,42 @@ const createInsertTableType3 = (colorHead: string) => {
         }
     }
 }
-watch(() => report.value, () => {
-    switch (report.value) {
-        case 'Postes':
-            createInsertTableType3('27AB90');
-            break;
-        case 'Llamadas':
-            createInsertTableType3('1877F2');
-            break;
+
+const createInsertTableType2 = (colorHead: string, tableData: object) => {
+    // SI EL OBJETO EXISTE
+    if (tableData) {
+        const propsData = {
+            data: tableData,
+            minRows: 9,
+            color: colorHead,
+        }
+        // CREAMOS UNA INSTANCIA DEL COMPONENTE 'TableType2'
+        const newTable = createApp(TableType2, propsData)
+        console.log(`newTable: ${newTable}`)
+        // SI EL ELEMENTO '<div class="table-reports-container"></div>' AL QUE 'table' HACE REFERENCIA, EXISTE 
+        if (table.value) {
+            // MONTAMOS LA INSTANCIA DE 'TableType2' EN EL ELEMENTO QUE REFERENCIA 'table'
+            newTable.mount(table.value)
+            console.log(`table: ${table.value}`)
+        }
     }
-});
+}
+onMounted(() => {
+    watch(() => report.value, () => {
+        switch (report.value) {
+            case 'Postes':
+                createInsertTableType3('27AB90', postsTable.value);
+                break;
+            case 'Estado postes':
+                createInsertTableType2('1877F2', actualPostTable.value);
+                break;
+            case 'Llamadas':
+                createInsertTableType3('1877F2', callsTable.value);
+        }
+    });
+
+    report.value = "Estado postes"
+})
 </script>
 
 <style scoped>
@@ -120,7 +156,7 @@ watch(() => report.value, () => {
 }
 
 .inputs-buttons-container {
-    padding: 20px;
+    padding: 10px;
     grid-column: 1;
     grid-row: 1;
     background: #fff;
@@ -128,20 +164,12 @@ watch(() => report.value, () => {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: 1fr;
-    gap: 20px;
+    gap: 10px;
 }
 
 .disabled {
     opacity: 0.5;
     pointer-events: none;
-}
-
-#select-report-container,
-#select-date-container,
-#select-post-container,
-#select-audio-container {
-    font-size: 25px;
-    font-family: "Baloo 2", sans-serif;
 }
 
 #select-report-container {
@@ -165,25 +193,25 @@ watch(() => report.value, () => {
 }
 
 
-#icon-save-button {
+#icon-play-button {
     grid-column: 5;
     grid-row: 1;
     border-radius: 10px;
     background: #2ABBA7;
 }
 
-#icon-save-button:hover {
+#icon-play-button:hover {
     background: #00DABC;
 }
 
-#icon-clear-button {
+#icon-export-button {
     grid-column: 6;
     grid-row: 1;
     border-radius: 10px;
     background: #F0284A;
 }
 
-#icon-clear-button:hover {
+#icon-export-button:hover {
     background: #ff002b;
 }
 
@@ -192,25 +220,32 @@ watch(() => report.value, () => {
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
 }
 
 .button-container h3 {
-    font-size: 20px;
+    font-size: 14px;
     font-family: "Baloo 2", sans-serif;
     font-weight: 300;
     color: #fff;
     margin: 0;
     padding: 0;
     word-wrap: break-word;
-    width: auto;
     height: auto;
     line-height: 1
 }
 
+#icon-play-button h3 {
+    width: 70px;
+}
+
+#icon-export-button h3 {
+    width: 55px
+}
+
 .button-container img {
-    height: 30px;
+    height: 50%;
     width: auto;
 }
 
@@ -218,9 +253,9 @@ watch(() => report.value, () => {
     grid-column: 1;
     grid-row: 2;
     background: #fff;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
-    padding: 20px 0;
+    padding: 10px 0;
     display: flex;
     justify-content: center;
 }

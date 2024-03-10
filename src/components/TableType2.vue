@@ -3,28 +3,26 @@
         <div class="table-wrapper">
             <table>
                 <thead :style="{ background: `#${props.color}` }">
-                    <th v-for="column in columns" :key="column" :style="{ width: `${100 / (columns.length + 2)}%` }">
-                        {{ column.toUpperCase() }}
+                    <th v-for="column in columns.slice(0, -1)" :key="column" :style="{ width: `${100 / (columns.length + 2)}%` }">
+                        {{ column.replace(/_/g, ' ').toUpperCase() }}
                     </th>
                 </thead>
                 <tbody>
                     <tr v-for="(row, rowIndex) in data" :key="rowIndex" :id="`row-${rowIndex}-${props.nameTable}`">
-                        <td v-for="column in columns" :key="column" :style="{ background: `#${row.color}` }">
+                        <td v-for="column in columns.slice(0, -1)" :key="column" :style="{ background: `#${row.color}` }">
                             <div class="centered-td-content">
                                 <input type="text" :value="row[column]" readonly>
                             </div>
                         </td>
                     </tr>
                     <tr v-for="(_, i) in additionalRows" :key="i">
-                        <td v-for="column in columns" :key="column" :style="{ background: `#${data[data.length() - 1].color}` }">
-                            <div class="centered-td-content"></div>
-                        </td>
+                        <td v-for="column in columns" :key="column" :style="{ background: `#${data[-1].color}` }"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-</template>  
+</template>
 
 <script setup>
 import { ref, defineProps, onBeforeMount } from 'vue';
@@ -34,14 +32,6 @@ const numAdditionalRows = ref(0);
 const props = defineProps({
     data: {
         type: Array,
-        required: true,
-    },
-    nameTable: {
-        type: String,
-        required: true,
-    },
-    nameObject: {
-        type: String,
         required: true,
     },
     minRows: {
@@ -62,7 +52,6 @@ onBeforeMount(() => {
             additionalRows.value.push(i + props.data.length);
         }
     }
-
 })
 </script>
 
@@ -81,12 +70,11 @@ onBeforeMount(() => {
 .table-wrapper {
     overflow-y: auto;
     height: auto;
-    width: 97.5%;
+    width: 98%;
     display: flex;
     justify-content: center;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
     overflow: auto;
+    border-radius: 10px 10px 0 0;
 }
 
 .table-wrapper::-webkit-scrollbar {
@@ -97,11 +85,13 @@ table {
     width: 100%;
     height: auto;
     border: none;
-    border-spacing: 3px;
-    border-radius: 20px;
+    border-spacing: 0px;
     outline: none;
     margin: none;
-    background: #7DB6FF;
+    border-collapse: separate;
+    border-radius: 10px;
+    overflow: auto;
+    background: #F3F3F3;
 }
 
 thead {
@@ -109,52 +99,63 @@ thead {
     top: 0px;
     z-index: 1;
     width: 100%;
-    height: 45px;
-    border-radius: 0 20px 20px 0;
-    background: #070a10;
+    height: 30px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #fff;
 }
 
 thead th {
     width: auto;
     max-width: 120px;
-    max-height: 45px;
+    max-height: 30px;
     color: #fff;
     font-family: "Baloo 2", sans-serif;
-    font-size: 23px;
+    font-size: 15px;
     font-weight: 500;
+    border-right: 3px solid #D5DFFA;
 }
 
 thead th:first-of-type {
-    border-top-left-radius: 20px;
+    border-top-left-radius: 10px;
+    border-right: 3px solid #D5DFFA
 }
 
 thead th:last-of-type {
-    border-top-right-radius: 20px;
+    border: 0px;
+    border-top-right-radius: 10px;
 }
 
 tbody {
     width: 100%;
     height: auto;
     background: #F3F3F3;
-    border-radius: 0 20px 20px 0;
     row-gap: 5px;
 }
 
+tbody tr:first-of-type {
+    border: 0px;
+}
+
+tbody tr td:last-of-type {
+    border: 0px;
+}
 
 tbody tr:last-of-type td:first-of-type {
-    border-bottom-left-radius: 20px;
+    border-bottom-left-radius: 10px;
 }
 
 tbody tr:last-of-type td:last-of-type {
-    border-bottom-right-radius: 20px;
+    border-bottom-right-radius: 10px;
 }
 
 td {
     width: auto;
-    height: 45px;
+    height: 30px;
     text-align: center;
     padding: 0;
     overflow: hidden;
+    border-right: 3px solid #D5DFFA;
 }
 
 .centered-td-content {
@@ -170,12 +171,12 @@ td {
     outline: none;
     width: 100%;
 
-    max-height: 45px;
+    max-height: 30px;
     background: transparent;
     padding: 0 20px 0 20px;
 
     font-family: "Baloo 2", sans-serif;
-    font-size: 19px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     text-overflow: ellipsis;
