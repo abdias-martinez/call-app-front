@@ -119,6 +119,7 @@ const store = createStore({
             const responseData = await response.json();
             console.log('Respuesta del servidor:', responseData);
             context.commit('setAlertMessage', responseData)
+            context.commit('setLoading', false);
           } else {
             console.error('Error en la respuesta del servidor:', response.status, response.statusText);
           }

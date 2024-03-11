@@ -1,7 +1,7 @@
 <template>
     <div class="table-3-container">
         <div class="table-wrapper">
-            <table>
+            <table class="exportable-table">
                 <thead :style="{ background: `#${props.color}` }">
                     <th v-for="column in columns" :key="column" :style="{ width: `${100 / (columns.length + 2)}%` }">
                         {{ column.toUpperCase() }}
@@ -47,9 +47,9 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
-    columns.value = Object.keys(props.data[0])
+    columns.value = props.data.length > 0 ? Object.keys(props.data[0]) : [];
     if (props.data.length < props.minRows) {
-        numAdditionalRows.value = props.minRows - props.data.length
+        numAdditionalRows.value = props.minRows - props.data.length;
         for (let i = 0; i <= numAdditionalRows.value; i++) {
             additionalRows.value.push(i + props.data.length);
         }
@@ -61,10 +61,7 @@ onBeforeMount(() => {
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800');
 
 :root {
-    --margin-color: #{{ props.color }
-}
-
-;
+    --margin-color: #{{ props.color }}
 }
 
 .table-3-container {

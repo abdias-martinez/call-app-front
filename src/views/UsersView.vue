@@ -255,18 +255,20 @@ const clearDataUser = () => {
 
 #icon-save-button {
     background: #2ABBA7;
+    transition: background 0.3s ease;
 }
 
 #icon-save-button:hover {
-    background: #00DABC;
+    background: #27a794;
 }
 
 #icon-clear-button {
     background: #F0284A;
+    transition: background 0.3s ease;
 }
 
 #icon-clear-button:hover {
-    background: #ff002b;
+    background: #e50b30;
 }
 
 .button-container img {

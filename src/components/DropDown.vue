@@ -78,7 +78,9 @@ onMounted(() => {
     });
 
     watch(() => store.state.cleaned, () => {
+        console.log('se detectó un cambio en cleaned')
         if (Array.isArray(store.state.cleaned) && store.state.cleaned.includes(props.identifier)) {
+            console.log(`dropdown-${props.identifier} limpiado`)
             clearSelection();
         }
     });

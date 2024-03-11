@@ -96,12 +96,12 @@ onBeforeMount(() => {
         const derived: string[] = []
         const vehicle: string[] = []
         const persons: string[] = []
-        JSON.parse(tables)["CAE"]["Registro_Poste"]["records"].forEach((record: {num_poste: string}) => {
+        JSON.parse(tables)["CAE"]["Registro_Poste"]["records"].forEach((record: { num_poste: string }) => {
             if (!posts.includes(record['num_poste']) && record['num_poste'] !== '') {
                 posts.push(record['num_poste'])
             }
         })
-        JSON.parse(tables)["CAE"]["Opciones_Eventos"]["records"].forEach((record: {Evento: string, Derivado: string, Vehiculo: string, Personas: string}) => {
+        JSON.parse(tables)["CAE"]["Opciones_Eventos"]["records"].forEach((record: { Evento: string, Derivado: string, Vehiculo: string, Personas: string }) => {
             if (!events.includes(record['Evento']) && record['Evento'] !== '') {
                 events.push(record['Evento'])
             }
@@ -213,6 +213,7 @@ const registerEvent = async () => {
 }
 //FUNCIONALIDAD PARA LIMPIAR LOS CAMPOS DE ENTRADA DEL FORMULARIO
 const clearDataEvent = () => {
+    console.log(`isLoading: ${store.state.isLoading}`)
     if (!store.state.loading) {
         // CAMBIAMOS EL ESTADO PARA QUE EL COMPONENTE '<DropDown/>' LO DETECTE Y BORRE LA OPCIÓN QUE TIENE SELECCIONADA
         store.state.cleaned = []
@@ -331,18 +332,20 @@ const obtainDateTimeRegister = () => {
 
 #icon-save-button {
     background: #2ABBA7;
+    transition: background 0.3s ease;
 }
 
 #icon-save-button:hover {
-    background: #00DABC;
+    background: #27a794;
 }
 
 #icon-clear-button {
     background: #F0284A;
+    transition: background 0.3s ease;
 }
 
 #icon-clear-button:hover {
-    background: #ff002b;
+    background: #e50b30;
 }
 
 .button-container img {

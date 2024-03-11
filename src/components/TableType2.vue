@@ -1,7 +1,7 @@
 <template>
     <div class="table-2-container">
         <div class="table-wrapper">
-            <table>
+            <table class="exportable-table">
                 <thead :style="{ background: `#${props.color}` }">
                     <th v-for="column in columns.slice(0, -1)" :key="column" :style="{ width: `${100 / (columns.length + 2)}%` }">
                         {{ column.replace(/_/g, ' ').toUpperCase() }}
@@ -9,7 +9,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(row, rowIndex) in data" :key="rowIndex" :id="`row-${rowIndex}-${props.nameTable}`">
-                        <td v-for="column in columns.slice(0, -1)" :key="column" :style="{ background: `#${row.color}` }">
+                        <td v-for="column in columns.slice(0, columns.length - 1)" :key="column" :style="{ background: `#${row.color}` }">
                             <div class="centered-td-content">
                                 <input type="text" :value="row[column]" readonly>
                             </div>
@@ -45,9 +45,9 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
-    columns.value = Object.keys(props.data[0])
+    columns.value = props.data.length > 0 ? Object.keys(props.data[0]) : [];
     if (props.data.length < props.minRows) {
-        numAdditionalRows.value = props.minRows - props.data.length
+        numAdditionalRows.value = props.minRows - props.data.length;
         for (let i = 0; i <= numAdditionalRows.value; i++) {
             additionalRows.value.push(i + props.data.length);
         }

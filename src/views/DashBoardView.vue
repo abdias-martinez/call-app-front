@@ -131,15 +131,17 @@ import { onBeforeMount, onMounted, ref, watch, createApp } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import VueJwtDecode from 'vue-jwt-decode';
+
 // DEFINICIÓN DE CONSTANTES
-const userRole = ref();
-const userName = ref();
-const dateTimeSession = ref();
-const router = useRouter();
-const newCalls = ref(0);
-const newMessages = ref(0);
-const store = useStore();
-const alertsContainer = ref(null);
+const userRole = ref();  // Rol del usuario
+const userName = ref();  // Nombre de usuario
+const dateTimeSession = ref();  // Fecha y hora de la sesión
+const router = useRouter();  // Instancia del enrutador
+const newCalls = ref(0);  // Contador de nuevas llamadas
+const newMessages = ref(0);  // Contador de nuevos mensajes
+const store = useStore();  // Almacenamiento Vuex
+const alertsContainer = ref(null);  // Contenedor de alertas
+
 // CONFIGURACIÓN ANTES DE MONTAR EL DASHBOARD
 onBeforeMount(() => {
     // OBTENEMOS EL JWT ALMACENADO EN EL LOCAL-STORAGE
@@ -165,6 +167,7 @@ onBeforeMount(() => {
         newMessages.value = JSON.parse(tables)["CAE"]["Notificaciones"]["records"][0]["mensajes"]
     }
 });
+
 // FUNCIONALIDAD DE CIERRE DE SESIÓN
 const logout = () => {
     // ELIMINAMOS EL JWT ALMACENADO EN EL LOCAL-STORAGE
@@ -176,6 +179,7 @@ const logout = () => {
     // REDIRIGIMOS AL USUARIO A LA RUTA '/login'
     router.push('/login');
 };
+
 // FUNCIONALIDAD PARA ELIMINAR EL ÚLTIMO COMPONENTE 'AlertComponent' DENTRO DE '<div class="alerts-container"></div>'
 const removeLastNotification = () => {
     // OBTENEMOS EL ÚLTIMO ELEMENTO HIJO DE LA CLASE '<div class="alerts-container"></div>'
@@ -186,15 +190,17 @@ const removeLastNotification = () => {
         document.querySelector('.alerts-container')?.removeChild(lastChild)
     }
 };
+
 // FUNCIONALIDAD PARA USAR LA FUNCIÓN MUTATION 'serRemoveLastNotification' 
 const changeStateRemoveLastNotifiaction = () => {
     // USO DE LA FUNCION MUTATION 'serRemoveLastNotification' DEL STORE
     store.commit('setRemoveLastNotification')
 }
 
+// FUNCIONALIDAD PARA MARCAR NOTIFICACIONES NUEVAS COMO YA VISTAS
 const newNotificationSeen = async (typeWidget: string) => {
     console.log(`Boton para marcar notificacion ${typeWidget} vista, presionada`)
-    // OBTENEMOS EL OBJETO 'table' ALMACENADO EN EL LOCAL-STORAGE
+    // OBTENEMOS 'table' ALMACENADO EN EL LOCAL-STORAGE
     const tables = localStorage.getItem('tables');
     if (tables) {
         const tablesJSON = JSON.parse(tables)
@@ -205,10 +211,13 @@ const newNotificationSeen = async (typeWidget: string) => {
         const editedRecord = {"llamadas": calls, "mensajes": messages}
         const identifier = typeWidget == 'message' ? 'mensajes' : 'llamadas'
         await store.dispatch('editRecordTable', { "editRecord": editedRecord, "originalRecord": originalRecord, "identifier": identifier, "nameTable": "notifications" })
-        tablesJSON["CAE"]["Notificaciones"]["records"] = [editedRecord];
-        // ACTUALIZAMOS EL VALOR DEL JSON 'tables' ALMACENADO EN EL LOCAL-STORAGE
+        // ACTUALIZAMOS EL OBJETO 'table' CON LOS VALORES MODIFICADOS
+        tablesJSON["CAE"]["Notificaciones"]["records"] = [{ llamadas: calls, mensajes: messages }];
+
+        // ALMACENAMOS EL OBJETO MODIFICADO EN EL LOCAL-STORAGE
         localStorage.setItem('tables', JSON.stringify(tablesJSON));
         
+        // RESETEAMOS EL CONTADOR DE NOTIFICACIONES PARA EL WIDGET ESPECÍFICO
         newCalls.value = typeWidget == 'calls' ? '0' : originalRecord["llamadas"]
         newMessages.value = typeWidget == 'message' ? '0' : originalRecord["mensajes"]
     }
@@ -254,6 +263,7 @@ onMounted(() => {
             alert.mount(alertsContainer.value);
         }
     });
+    
     // FUNCIONALIDAD QUE VIGILA SI HUBO ALGÚN CAMBIO EN EL ESTADO 'removeLastNotification'
     watch(() => store.state.removeLastNotification, () => {
         // SI EL ESTADO 'removeLastNotification' ES VERDADERO
@@ -447,6 +457,7 @@ onMounted(() => {
     gap: 40px;
 }
 
+/* estilos para los widget de notificación */
 .widget-data-new {
     position: relative;
     height: 100%;
@@ -461,12 +472,14 @@ onMounted(() => {
     cursor: pointer;
 }
 
+/* estilos para el icono de los widget de notificación */
 .widget-data-new img {
     position: relative;
     width: 25px;
     height: auto;
 }
 
+/* estilos para el valor mostrado por los widget de notificación */
 .widget-data-new .data-new {
     position: absolute;
     top: -8px;
@@ -482,6 +495,7 @@ onMounted(() => {
     align-items: center;
 }
 
+/* estilos para el widget de nombre de usuario */
 .widget-username {
     height: 100%;
     width: 200px;
@@ -494,11 +508,13 @@ onMounted(() => {
     gap: 40px;
 }
 
+/* estilos para el ícono del widgete de nombre de usuario */
 .widget-username img {
     position: relative;
     left: 30px;
 }
 
+/* estilos para el contendor de texto del widget de nombre de usuario */
 .widget-username .username-container {
     width: 55%;
     height: auto;

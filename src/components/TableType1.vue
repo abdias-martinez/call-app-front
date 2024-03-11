@@ -298,18 +298,20 @@ input {
 }
 
 .icon-update-record-container {
-    background: #2ABBA7
+    background: #2ABBA7;
+    transition: background 0.3s ease;
 }
 
 .icon-remove-record-container {
-    background: #F0284A
+    background: #F0284A;
+    transition: background 0.3s ease;
 }
 
 .icon-update-record-container:hover {
-    background: #00DABC
+    background: #27a794
 }
 
 .icon-remove-record-container:hover {
-    background: #ff002b
+    background: #e50b30
 }
 </style>

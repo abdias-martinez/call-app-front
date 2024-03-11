@@ -4,40 +4,20 @@
         <!-- Formulario de entrada y botones -->
         <form class="inputs-buttons-container">
             <!-- Desplegable (dropdown) para seleccionar el tipo de reporte -->
-            <DropDown 
-                id="select-report-container" 
-                :options="['Postes', 'Estado postes', 'Llamadas']"
-                :name="'Tipo reporte'" 
-                :identifier="'report'" 
-                @optionIsChange="updateReportType" 
-            />
+            <DropDown id="select-report-container" :options="['Postes', 'Estado postes', 'Llamadas']"
+                :name="'Tipo reporte'" :identifier="'report'" @optionIsChange="updateReportType" />
 
             <!-- Desplegable (dropdown) para seleccionar la fecha -->
-            <DropDown 
-                id="select-date-container" 
-                :options="dateOptions" 
-                :name="'Filtrar por fecha'" 
-                :identifier="'date'"
-                @optionIsChange="updateDate" 
-            />
+            <DropDown id="select-date-container" :options="dateOptions" :name="'Filtrar por fecha'" :identifier="'date'"
+                @optionIsChange="updateDate" />
 
             <!-- Desplegable (dropdown) para seleccionar el poste -->
-            <DropDown 
-                id="select-post-container" 
-                :options="postOptions" 
-                :name="'Filtrar por poste'" 
-                :identifier="'post'"
-                @optionIsChange="updatePost" 
-            />
+            <DropDown id="select-post-container" :options="postOptions" :name="'Filtrar por poste'" :identifier="'post'"
+                @optionIsChange="updatePost" />
 
             <!-- Desplegable (dropdown) para seleccionar un audio -->
-            <DropDown 
-                id="select-audio-container" 
-                :options="audioOptions" 
-                :name="'Audio disponible'"
-                :identifier="'audio'"
-                @optionIsChange="updateAudio" 
-            />
+            <DropDown id="select-audio-container" :options="audioOptions" :name="'Audio disponible'"
+                :identifier="'audio'" @optionIsChange="updateAudio" />
 
             <!-- Botón guardar -->
             <div class="button-container" id="icon-play-button"
@@ -48,7 +28,7 @@
 
 
             <!-- Botón limpiar -->
-            <div class="button-container" id="icon-export-button"
+            <div class="button-container" id="icon-export-button" @click="exportReport"
                 :class="{ 'disabled': Array.isArray(store.state.blocked) && store.state.blocked.includes('play export') }">
                 <h3>Exportar reporte</h3>
                 <img src="../assets/images/icon-export.png" alt="icon-export-button">
@@ -64,6 +44,8 @@
 
 <script lang="ts" setup>
 // IMPORTACIONES NECESARIAS
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas';
 import DropDown from '@/components/DropDown.vue'
 import TableType2 from '@/components/TableType2.vue'
 import TableType3 from '@/components/TableType3.vue'
@@ -86,10 +68,11 @@ const actualPostTable = ref()
 const callsTable = ref()
 
 // OPCIONES CALCULADAS PARA LOS DROPDOWN
-const dateOptions = ref([])
-const postOptions = ref([])
-const audioOptions = ref([])
+const dateOptions = ref<string[]>([])
+const postOptions = ref<string[]>([])
+const audioOptions = ref<string[]>([])
 
+//
 onBeforeMount(() => {
     const tablesJSON = localStorage.getItem('tables')
     if (tablesJSON) {
@@ -116,21 +99,23 @@ const updateAudio = (newAudio: string) => {
     audio.value = newAudio
 }
 const obtainDates = (reportTable: Array<{ fecha?: string; fecha_sms?: string }>): string[] => {
-    const dates = []
+    const dates: string[] = [];
     reportTable.forEach((record: { fecha?: string; fecha_sms?: string }) => {
-        const dateString = record['fecha'] || record['fecha_sms'];
-        const formatedDateString = dateString.split(' ')[0]
-        if (!dates.includes(formatedDateString)) {
-            dates.push(formatedDateString)
+        const dateString = record?.fecha || record?.fecha_sms;
+        if (dateString) {
+            const formatedDateString = dateString.split(' ')[0];
+            if (!dates.includes(formatedDateString)) {
+                dates.push(formatedDateString);
+            }
         }
-    })
-    return dates
-}
+    });
+    return dates;
+};
 
 const obtainPosts = (reportTable: Array<{ poste?: string }>): string[] => {
-    const posts = []
+    const posts: string[] = [];
     reportTable.forEach((record: { poste?: string }) => {
-        if (!posts.includes(record["poste"])) {
+        if (record["poste"] && !posts.includes(record["poste"])) {
             posts.push(record["poste"])
         }
     })
@@ -141,30 +126,25 @@ const obtainAudioNames = (reportTable: Array<{ nombre_audio?: string }>): string
     return reportTable.map((record: { nombre_audio?: string }) => record["nombre_audio"] || '');
 }
 
-const filterTableByDate = (records: { fecha?: string, fecha_sms?: string }[], date: string): string[] => {
-    const filteredRecords = []
-    records.filter((record: { fecha?: string, fecha_sms?: string }) => {
-        const dateString = record['fecha'] || record['fecha_sms'];
-        const formatedDateString = dateString.split(' ')[0]
-        if (date == formatedDateString) {
-            filteredRecords.push(record)
+const filterTableByDate = (records: Array<{ fecha?: string; fecha_sms?: string }>, date: string): Array<{ fecha?: string; fecha_sms?: string }> => {
+    return records.filter((record: { fecha?: string; fecha_sms?: string }) => {
+        const dateString = record?.fecha || record?.fecha_sms;
+        if (dateString) {
+            const formatedDateString = dateString.split(' ')[0];
+            return date === formatedDateString;
         }
-    })
-    return filteredRecords
-}
+        return false;
+    });
+};
 
-const filterTableByPost = (records: { poste: string }[], post: string): string[] => {
-    const filteredRecords = []
-    records.filter((record: { poste: string }) => {
-        const postRecord = record['poste'];
-        if (post == postRecord) {
-            filteredRecords.push(record)
-        }
-    })
-    return filteredRecords
-}
+const filterTableByPost = (records: Array<{ poste: string }>, post: string): Array<{ poste: string }> => {
+    return records.filter((record: { poste: string }) => {
+        const postValue = record?.poste
+        return postValue === post;
+    });
+};
 
-const createInsertTableType3 = (colorHead: string, tableData: object, tableName: string, blocked: string[]) => {
+const createInsertTableType3 = (colorHead: string, tableData: object, tableName: string, blocked: string[]): void => {
     // SI EL OBJETO EXISTE
     if (tableData) {
         const propsData = {
@@ -215,6 +195,11 @@ const createInsertTableType2 = (colorHead: string, tableData: object, tableName:
 onMounted(() => {
     createInsertTableType2('1877F2', actualPostTable.value, 'Reporte_actual_postes', ['date', 'post', 'audio', 'play button']);
     watch(() => report.value, () => {
+        console.log(`reporte mostrado: ${report.value}`)
+        date.value = ''
+        post.value = ''
+        audio.value = ''
+
         store.state.cleaned = []
         store.state.cleaned = ['date', 'post', 'audio']
         switch (report.value) {
@@ -226,43 +211,50 @@ onMounted(() => {
                 break;
             case 'Llamadas':
                 createInsertTableType3('1877F2', callsTable.value, 'Reporte_llamadas', []);
+                break;
         }
     });
 
     watch(() => date.value, () => {
-        store.state.cleaned = []
-        store.state.cleaned = ['post', 'audio']
-        let tableName
-        switch (report.value) {
-            case 'Postes': tableName = 'Reporte_postes'; break;
-            case 'Estado postes': tableName = 'Reporte_actual_postes'; break;
-            case 'Llamadas': tableName = 'Reporte_llamadas'; break;
-        }
+        if (date.value !== '') {
+            console.log(`Filtrar por fecha ${date.value}`)
 
-        if (tableName == 'Reporte_postes' || tableName == 'Reporte_llamadas') {
-            const tableToFilter = JSON.parse(tables.value)["CAE"][tableName]["records"]
-            const fiteredTable = filterTableByDate(tableToFilter, date.value)
-            const color = tableName == 'Reporte_postes' ? '27AB90' : '1877F2'
-            createInsertTableType3(color, fiteredTable, tableName, ['audio', 'play button'])
+            store.state.cleaned = []
+            store.state.cleaned = ['post', 'audio']
+            let tableName
+            switch (report.value) {
+                case 'Postes': tableName = 'Reporte_postes'; break;
+                case 'Estado postes': tableName = 'Reporte_actual_postes'; break;
+                case 'Llamadas': tableName = 'Reporte_llamadas'; break;
+            }
+
+            if (tableName == 'Reporte_postes' || tableName == 'Reporte_llamadas') {
+                const tableToFilter = JSON.parse(tables.value)["CAE"][tableName]["records"]
+                const fiteredTable = filterTableByDate(tableToFilter, date.value)
+                const color = tableName == 'Reporte_postes' ? '27AB90' : '1877F2'
+                createInsertTableType3(color, fiteredTable, tableName, ['audio', 'play button'])
+            }
         }
     })
 
     watch(() => post.value, () => {
-        store.state.cleaned = []
-        store.state.cleaned = ['date', 'audio']
-        let tableName
-        switch (report.value) {
-            case 'Postes': tableName = 'Reporte_postes'; break;
-            case 'Estado postes': tableName = 'Reporte_actual_postes'; break;
-            case 'Llamadas': tableName = 'Reporte_llamadas'; break;
-        }
+        if (post.value !== '') {
+            store.state.cleaned = []
+            store.state.cleaned = ['date', 'audio']
+            let tableName
+            switch (report.value) {
+                case 'Postes': tableName = 'Reporte_postes'; break;
+                case 'Estado postes': tableName = 'Reporte_actual_postes'; break;
+                case 'Llamadas': tableName = 'Reporte_llamadas'; break;
+            }
 
-        if (tableName == 'Reporte_postes' || tableName == 'Reporte_llamadas') {
-            const tableToFilter = JSON.parse(tables.value)["CAE"][tableName]["records"]
-            const fiteredTable = filterTableByPost(tableToFilter, post.value)
-            const color = tableName == 'Reporte_postes' ? '27AB90' : '1877F2'
-            const blocked = tableName == 'Reporte_postes' ? ['audio', 'play button'] : []
-            createInsertTableType3(color, fiteredTable, tableName, blocked)
+            if (tableName == 'Reporte_postes' || tableName == 'Reporte_llamadas') {
+                const tableToFilter = JSON.parse(tables.value)["CAE"][tableName]["records"]
+                const fiteredTable = filterTableByPost(tableToFilter, post.value)
+                const color = tableName == 'Reporte_postes' ? '27AB90' : '1877F2'
+                const blocked = tableName == 'Reporte_postes' ? ['audio', 'play button'] : []
+                createInsertTableType3(color, fiteredTable, tableName, blocked)
+            }
         }
     })
 
@@ -271,6 +263,40 @@ onMounted(() => {
         store.state.cleaned = ['date', 'post']
     })
 })
+
+const exportReport = () => {
+    const report = table.value
+    const tableHTML = report?.querySelector('div .table-wrapper table')
+    const clonedTable = tableHTML.cloneNode(true)
+    document.body.appendChild(clonedTable);
+
+    clonedTable.style.borderRadius = '0'
+    clonedTable.querySelector('thead').style.borderRadius = '0'
+    clonedTable.querySelector('thead th:first-of-type').style.borderTopLeftRadius = '0'
+    clonedTable.querySelector('thead th:last-of-type').style.borderTopRightRadius = '0'
+    clonedTable.querySelector('tbody tr:last-of-type td:first-of-type').style.borderBottomLeftRadius = '0'
+    clonedTable.querySelector('tbody tr:last-of-type td:last-of-type').style.borderBottomRightRadius = '0'
+
+    const inputs = clonedTable.querySelectorAll('tbody tr td .centered-td-content input') as HTMLTableCellElement[]
+    inputs.forEach(input => {
+        input.style.width = 'auto'
+    })
+    const rect = clonedTable.getBoundingClientRect()
+    const realWidth = rect.width
+    const realHeight = rect.height
+    const PDF_Width = realWidth
+    const PDF_Height = realHeight
+    const canvas_image_width = PDF_Width
+    const canvas_image_height = PDF_Height
+    const scaleFactor = 4
+    html2canvas(clonedTable, { scale: scaleFactor }).then(function (canvas) {
+        const imgData = canvas.toDataURL("image/png")
+        const pdf = new jsPDF('landscape', 'pt', [PDF_Width, PDF_Height])
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas_image_width, canvas_image_height, '', 'FAST')
+        pdf.save("Reporte.pdf")
+    })
+    document.body.removeChild(clonedTable);
+}
 
 </script>
 
@@ -336,10 +362,11 @@ onMounted(() => {
     grid-row: 1;
     border-radius: 10px;
     background: #2ABBA7;
+    transition: background 0.3s ease;
 }
 
 #icon-play-button:hover {
-    background: #00DABC;
+    background: #27a794;
 }
 
 #icon-export-button {
@@ -347,10 +374,11 @@ onMounted(() => {
     grid-row: 1;
     border-radius: 10px;
     background: #F0284A;
+    transition: background 0.3s ease;
 }
 
 #icon-export-button:hover {
-    background: #ff002b;
+    background: #e50b30;
 }
 
 .button-container {
