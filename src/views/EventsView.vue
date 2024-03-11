@@ -98,24 +98,24 @@ onBeforeMount(() => {
         const persons: string[] = []
         JSON.parse(tables)["CAE"]["Registro_Poste"]["records"].forEach((record: { num_poste: string }) => {
             if (!posts.includes(record['num_poste']) && record['num_poste'] !== '') {
-                posts.push(record['num_poste'])
+                posts.push(record['num_poste'].toString())
             }
         })
-        JSON.parse(tables)["CAE"]["Opciones_Eventos"]["records"].forEach((record: { Evento: string, Derivado: string, Vehiculo: string, Personas: string }) => {
-            if (!events.includes(record['Evento']) && record['Evento'] !== '') {
-                events.push(record['Evento'])
-            }
-            if (!derived.includes(record['Derivado']) && record['Derivado'] !== '') {
-                derived.push(record['Derivado'])
-            }
-            if (!vehicle.includes(record['Vehiculo']) && record['Vehiculo'] !== '') {
-                vehicle.push(record['Vehiculo'])
-            }
-            if (!persons.includes(record['Personas']) && record['Personas'] !== '') {
-                persons.push(record['Personas'])
-            }
+        JSON.parse(tables)["CAE"]["Tipos_Evento"]["records"].forEach((record: { evento: string }) => {
+                events.push(record['evento'])
         })
-        postOptions.value = posts.sort()
+        JSON.parse(tables)["CAE"]["Tipos_Derivado"]["records"].forEach((record: { derivado: string }) => {
+                derived.push(record['derivado'])
+        })
+        JSON.parse(tables)["CAE"]["Tipos_Vehiculo"]["records"].forEach((record: { vehiculo: string }) => {
+                vehicle.push(record['vehiculo'])
+        })
+        JSON.parse(tables)["CAE"]["Tipos_Persona"]["records"].forEach((record: { persona: string }) => {
+                persons.push(record['persona'])
+        })
+
+        postOptions.value = posts.sort((a: string, b: string) => parseInt(a) - parseInt(b))
+        console.log(postOptions.value)
         eventOptions.value = events
         derivedOptions.value = derived
         vehicleOptions.value = vehicle

@@ -5,8 +5,8 @@
             <form id="register-post-form">
                 <!-- Campos de entrada para Poste, Número, Operador, Progresiva y Ruta -->
                 <input class="input-container" id="input-1" type="text" placeholder="Poste" v-model="post"
-                    :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('namepost') || store.state.blocked.includes('all'))"
-                    :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('namepost') || store.state.blocked.includes('all')) }">
+                    :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('numpost') || store.state.blocked.includes('all'))"
+                    :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('numpost') || store.state.blocked.includes('all')) }">
 
                 <input class="input-container" id="input-2" type="text" placeholder="Número" v-model="number"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('number') || store.state.blocked.includes('all'))"
@@ -16,7 +16,7 @@
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('operator') || store.state.blocked.includes('all'))"
                     :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('operator') || store.state.blocked.includes('all')) }">
 
-                <input class="input-container" id="input-4" type="text" placeholder="Pregresiva" v-model="progresive"
+                <input class="input-container" id="input-4" type="text" placeholder="Progresiva" v-model="progresive"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('progresive') || store.state.blocked.includes('all'))"
                     :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('progresive') || store.state.blocked.includes('all')) }">
 
@@ -27,14 +27,14 @@
                 <!-- Contenedor de botones -->
                 <div class="buttons-container" id="buttons-1-container">
                     <!-- Botón guardar -->
-                    <div class="icon-save-button-container" @click="registerUser"
+                    <div class="icon-save-button-container" @click="registerData(dataPost, 'post_register', 'Registro_Poste', ['all'])"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="icon-clear-button-container" @click="clearDataUser"
+                    <div class="icon-clear-button-container" @click="() => {post = ''; number = ''; operator = ''; progresive = '', route = ''}"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
@@ -51,14 +51,14 @@
                 <!-- Contenedor de botones -->
                 <div class="buttons-container" id="buttons-2-container">
                     <!-- Botón guardar -->
-                    <div class="icon-save-button-container" @click="registerUser"
+                    <div class="icon-save-button-container" @click="registerData(dataEvent, 'event_types', 'Tipos_Evento', ['all'])"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="icon-clear-button-container" @click="clearDataUser"
+                    <div class="icon-clear-button-container" @click="() => {event = ''}"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
@@ -75,14 +75,14 @@
                 <!-- Contenedor de botones -->
                 <div class="buttons-container" id="buttons-3-container">
                     <!-- Botón guardar -->
-                    <div class="icon-save-button-container" @click="registerUser"
+                    <div class="icon-save-button-container" @click="registerData(dataDerived, 'derived_types', 'Tipos_Derivado', ['all'])"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="icon-clear-button-container" @click="clearDataUser"
+                    <div class="icon-clear-button-container" @click="() => {derived = ''}"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
@@ -92,21 +92,21 @@
         </div>
         <div id="register-vehicle-container" class="register-container">
             <form id="register-vehicle-form">
-                <input class="input-container" id="input-8" type="text" placeholder="Vehículo" v-model="vehicles"
+                <input class="input-container" id="input-8" type="text" placeholder="Vehículo" v-model="vehicle"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('vehicles') || store.state.blocked.includes('all'))"
                     :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('vehicles') || store.state.blocked.includes('all')) }">
 
                 <!-- Contenedor de botones -->
                 <div class="buttons-container" id="buttons-4-container">
                     <!-- Botón guardar -->
-                    <div class="icon-save-button-container" @click="registerUser"
+                    <div class="icon-save-button-container" @click="registerData(dataVehicle, 'vehicle_types', 'Tipos_Vehiculo', ['all'])"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="icon-clear-button-container" @click="clearDataUser"
+                    <div class="icon-clear-button-container" @click="() => {vehicle = ''}"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
@@ -116,21 +116,21 @@
         </div>
         <div id="register-persons-container" class="register-container">
             <form id="register-persons-form">
-                <input class="input-container" id="input-9" type="text" placeholder="Persona" v-model="persons"
+                <input class="input-container" id="input-9" type="text" placeholder="Persona" v-model="person"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('persons') || store.state.blocked.includes('all'))"
                     :class="{ 'disabled': Array.isArray(store.state.blocked) && (store.state.blocked.includes('persons') || store.state.blocked.includes('all')) }">
 
                 <!-- Contenedor de botones -->
                 <div class="buttons-container" id="buttons-5-container">
                     <!-- Botón guardar -->
-                    <div class="icon-save-button-container" @click="registerUser"
+                    <div class="icon-save-button-container" @click="registerData(dataPerson, 'person_types', 'Tipos_Persona', ['all'])"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_16_j4ihaq.png"
                             alt="icon-save-button">
                     </div>
 
                     <!-- Botón limpiar -->
-                    <div class="icon-clear-button-container" @click="clearDataUser"
+                    <div class="icon-clear-button-container" @click="() => {person = ''}"
                         :class="{ 'disabled': store.state.isLoading }">
                         <img src="https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png"
                             alt="icon-clear-button">
@@ -153,11 +153,70 @@ const number = ref('')
 const operator = ref('')
 const progresive = ref('')
 const route = ref('')
+const event = ref('')
+const derived = ref('')
+const vehicle = ref('')
+const person = ref('')
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO POSTE
+const dataPost = ref({
+    "num_poste": post,
+    "tel_numero": number,
+    "operador": operator,
+    "progresiva": progresive,
+    "ruta": route,
+})
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO EVENTO
+const dataEvent = ref({
+    "evento": event,
+})
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO DERIVADO
+const dataDerived = ref({
+    "derivado": derived,
+})
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO VEHICULO
+const dataVehicle = ref({
+    "vehiculo": vehicle,
+})
+// DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO PERSONA
+const dataPerson = ref({
+    "persona": person,
+})
+// FUNCIONALIDAD PARA REGISTRAR UN NUEVO USUARIO
+const registerData = async (data: object, nameTable: string, nameObject: string, blocked: string[]) => {
+    if (!store.state.isLoading) {
+        store.state.isLoading = true
+        const dataConst = data;
+        store.state.blocked = blocked
+        // ENVIAMOS 'dataConst' AL BACKEND PARA INSERTARLO EN LA TABLA 'nameTable' DE LA BASE DE DATOS
+        await store.dispatch('insertRecordTable', { "recordToInsert": dataConst, "nameTable": nameTable });
+        // SI EL REGISTRO SE HIZO SIN PROBLEMAS
+        if (store.state.alertMessage["type"] == "success") {
+            // OBTENEMOS EL JSON 'tables' ALMACENADO LOCAL-STORAGE
+            const tables = localStorage.getItem('tables');
+            // SI EL OBJETO EXISTE
+            if (tables) {
+                // CONVERTIMOS EL JSON 'tables' EN UN OBJETO
+                const tablesObject = JSON.parse(tables);
+                // ACTUALIZAMOS EL ARRAY 'records' DEL OBJETO 'nameObject' DEL OBJETO 'tablesObject'
+                tablesObject["CAE"][nameObject]["records"].push(dataConst);
+                // ACTUALIZAMOS EL VALOR DEL JSON 'tables' ALMACENADO EN EL LOCAL-STORAGE
+                localStorage.setItem('tables', JSON.stringify(tablesObject));
+            }
+        }
+        store.state.blocked = []
+        store.state.isLoading = false
+    }
+};
 </script>
 
 <style scoped>
 /* importamos la fuente 'Ubuntu' */
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 /* estilos para el contenedor de la vista home */
 .settings-view-container {
