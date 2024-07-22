@@ -1,7 +1,13 @@
 <template>
     <!-- Vista de eventos -->
     <div class="settings-view-container">
-        <div id="register-post-container" class="register-container">
+
+        <div class="inputs-buttons-container">
+            <DropDown id="select-setting-container" :options="['Registro postes', 'Registro evento', 'Registro derivado', 'Registro persona', 'Registro vehículo']"
+                :name="''" :value="selectedReportType"  :identifier="'report_settings'" @optionIsChange="updateReportType" />
+        </div>
+
+        <div v-if="selectedReportType === 'Registro postes'" id="register-post-container" class="register-container">
             <form id="register-post-form">
                 <!-- Campos de entrada para Poste, Número, Operador, Progresiva y Ruta -->
                 <input class="input-container" id="input-1" type="text" placeholder="Poste" v-model="post"
@@ -42,7 +48,7 @@
                 </div>
             </form>
         </div>
-        <div id="register-event-container" class="register-container">
+        <div v-if="selectedReportType === 'Registro evento'" id="register-event-container" class="register-container">
             <form id="register-event-form">
                 <input class="input-container" id="input-6" type="text" placeholder="Evento" v-model="event"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('eventname') || store.state.blocked.includes('all'))"
@@ -66,7 +72,7 @@
                 </div>
             </form>
         </div>
-        <div id="register-derived-container" class="register-container">
+        <div v-if="selectedReportType === 'Registro derivado'" id="register-derived-container" class="register-container">
             <form id="register-derived-form">
                 <input class="input-container" id="input-7" type="text" placeholder="Derivado" v-model="derived"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('derived') || store.state.blocked.includes('all'))"
@@ -90,7 +96,7 @@
                 </div>
             </form>
         </div>
-        <div id="register-vehicle-container" class="register-container">
+        <div v-if="selectedReportType === 'Registro vehículo'" id="register-vehicle-container" class="register-container">
             <form id="register-vehicle-form">
                 <input class="input-container" id="input-8" type="text" placeholder="Vehículo" v-model="vehicle"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('vehicles') || store.state.blocked.includes('all'))"
@@ -114,7 +120,7 @@
                 </div>
             </form>
         </div>
-        <div id="register-persons-container" class="register-container">
+        <div v-if="selectedReportType === 'Registro persona'" id="register-persons-container" class="register-container">
             <form id="register-persons-form">
                 <input class="input-container" id="input-9" type="text" placeholder="Persona" v-model="person"
                     :disabled="Array.isArray(store.state.blocked) && (store.state.blocked.includes('persons') || store.state.blocked.includes('all'))"
@@ -139,13 +145,19 @@
             </form>
         </div>
 
+       <div class="table-reports-container" ref="table">
+            <!-- Aquí se insertará la tabla de reportes -->
+        </div>
+
     </div>
 </template>
 
 <script lang="ts" setup>
 // IMPORTACIONES NECESARIAS
-import { ref } from 'vue'
+import { ref, createApp, onMounted, watch, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
+import DropDown from '@/components/DropDown.vue'
+import TableType1 from '@/components/TableType1.vue'
 // DEFINICIÓN DE CONSTANTES
 const store = useStore()
 const post = ref('')
@@ -157,6 +169,16 @@ const event = ref('')
 const derived = ref('')
 const vehicle = ref('')
 const person = ref('')
+
+const table = ref()
+const tables = ref()
+const postTable = ref()
+const eventTable = ref()
+const derivedTable = ref()
+const vehicleTable = ref()
+const personTable = ref()
+
+const selectedReportType = ref('Registro postes');
 // DEFINIMOS LA ESTRUCTURA REACTIVA QUE ALMACENARÁ LOS DATOS DEL FORMULARIO POSTE
 const dataPost = ref({
     "num_poste": post,
@@ -181,6 +203,76 @@ const dataVehicle = ref({
 const dataPerson = ref({
     "persona": person,
 })
+
+
+onBeforeMount(() => {
+    const tablesJSON = localStorage.getItem('tables')
+    if (tablesJSON) {
+        tables.value = tablesJSON
+
+        postTable.value = JSON.parse(tables.value)["CAE"]["Registro_Poste"]["records"]
+        eventTable.value = JSON.parse(tables.value)["CAE"]["Tipos_Evento"]["records"]
+        derivedTable.value = JSON.parse(tables.value)["CAE"]["Tipos_Derivado"]["records"]
+        vehicleTable.value = JSON.parse(tables.value)["CAE"]["Tipos_Vehiculo"]["records"]
+        personTable.value = JSON.parse(tables.value)["CAE"]["Tipos_Persona"]["records"]
+    }
+})
+
+const createInsertTable1 = (tableData: object, nameObject: string, nameTable: string ) => {
+    if (tableData) {
+        const propsData = {
+            data: tableData,
+            urls: ['https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_18_dx7tlk.png', 'https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png'],
+            nameTable: nameTable, //'events',
+            nameObject: nameObject, // Eventos',
+            minRows: 7,
+            identifier: 'id',
+            convertLow: true
+        }
+        const newTable = createApp(TableType1, propsData)
+        console.log(`newTable: ${newTable}`)
+        if (table.value) {
+            newTable.mount(table.value)
+            console.log(`table: ${table.value}`)
+        }
+    }
+}
+
+onMounted(() => {
+    createInsertTable1(postTable.value, 'Registro_Poste', 'post_register');
+
+    watch(() => selectedReportType.value, () => {
+        console.log(`reporte mostrado: ${selectedReportType.value}`)
+        post.value = ''
+
+        switch (selectedReportType.value) {
+            case 'Registro postes':
+                console.log('poste')
+                createInsertTable1(postTable.value, 'Registro_Poste', 'post_register');
+                break;
+            case 'Registro evento':
+                console.log('evento')
+                createInsertTable1(eventTable.value, 'Tipos_Evento', 'event_types');
+                break;
+            case 'Registro derivado':
+                console.log('derivado')
+                createInsertTable1(derivedTable.value, 'Tipos_Derivado', 'derived_types');
+                break;
+            case 'Registro vehículo':
+                createInsertTable1(vehicleTable.value, 'Tipos_Vehiculo', 'vehicle_types');
+                break;
+            case 'Registro persona':
+                createInsertTable1(personTable.value, 'Tipos_Persona', 'person_types');
+                break;
+        }
+    });
+
+})
+
+const updateReportType = (selectedOption: string) => {
+    selectedReportType.value = selectedOption;
+};
+
 // FUNCIONALIDAD PARA REGISTRAR UN NUEVO USUARIO
 const registerData = async (data: object, nameTable: string, nameObject: string, blocked: string[]) => {
     if (!store.state.isLoading) {
@@ -207,11 +299,32 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
         store.state.isLoading = false
     }
 };
+
 </script>
 
 <style scoped>
 /* importamos la fuente 'Ubuntu' */
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+.inputs-buttons-container {
+    padding: 10px;
+    grid-column: 1;
+    grid-row: 1;
+    background: #fff;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) repeat(2, 0.8fr);
+    grid-template-rows: 1fr;
+    gap: 10px;
+}
+
+#select-report-container {
+    grid-column: 5;
+    grid-row: 1;
+}
+#select-setting-container {
+    height: 50px;
+}
 
 .disabled {
     opacity: 0.5;
@@ -222,7 +335,7 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
 .settings-view-container {
     width: 90%;
     height: 100%;
-    display: grid;
+    /* display: grid; */
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(10, 1fr);
     gap: 40px;
@@ -237,6 +350,7 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
     padding: 0 15px 0 15px;
     color: #5B5B5B;
     font-family: "Baloo 2", sans-serif;
+    height: 36px;
 }
 
 .input-container::placeholder {
@@ -265,8 +379,8 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
 #register-post-form {
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+    /* grid-template-rows: repeat(3, 1fr); */
     padding: 10px;
     gap: 10px;
 }
@@ -310,33 +424,8 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
 }
 
 #buttons-1-container {
-    grid-column: 2;
+    grid-column: 6;
     grid-row: 1;
-}
-
-#input-1 {
-    grid-column: 1;
-    grid-row: 1;
-}
-
-#input-2 {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-#input-3 {
-    grid-column: 1;
-    grid-row: 3;
-}
-
-#input-4 {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-#input-5 {
-    grid-column: 2;
-    grid-row: 3;
 }
 
 #register-event-container {
@@ -433,5 +522,16 @@ const registerData = async (data: object, nameTable: string, nameObject: string,
 #buttons-5-container {
     grid-column: 2;
     grid-row: 1;
+}
+.table-reports-container {
+    grid-column: 1;
+    grid-row: 2;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    height: 100%;
 }
 </style>

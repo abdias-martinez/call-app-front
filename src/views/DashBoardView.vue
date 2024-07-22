@@ -2,6 +2,25 @@
     <!-- Panel de control -->
     <div class="container-dashboard">
         <!-- Menú de navegación -->
+
+<!-- Alerts container -->
+            <div v-if="isModalVisible" class="modal-container" ref="modalContainer">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="modal-close" @click="onCloseCall()">
+                            X
+                        </div>
+                        <div class="modal-call">
+                            <p>Llamada entrante</p>
+                            <div class="modal-icon">
+                                <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="64px" height="64px" viewBox="0 0 30 30" version="1.1" id="svg822" inkscape:version="0.92.4 (f8dce91, 2019-08-02)" sodipodi:docname="call.svg" fill="" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs id="defs816"></defs> <sodipodi:namedview id="base" pagecolor="#32334Ffffff" bordercolor="#32334F666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="17.833333" inkscape:cx="15" inkscape:cy="15" inkscape:document-units="px" inkscape:current-layer="layer1" showgrid="true" units="px" inkscape:window-width="1366" inkscape:window-height="713" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" showguides="false"> <inkscape:grid type="xygrid" id="grid816"></inkscape:grid> </sodipodi:namedview> <metadata id="metadata819"> <rdf:rdf> <cc:work rdf:about=""> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title> </dc:title> </cc:work> </rdf:rdf> </metadata> <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1" transform="translate(0,-289.0625)"> <path style="opacity:1;fill:#32334F;fill-opacity:0.78995439;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 12.098373,306.81773 C 8.6760837,303.39544 6.4307514,299.78841 6.0962517,297.49 l 2.1240829,-3.03559 4.1556334,4.15563 -0.707107,0.70711 c -1.01412,1.01412 -0.303541,3.9114 1.94377,6.15871 2.24731,2.24731 5.154504,2.9678 6.168623,1.95368 l 0.707107,-0.7071 4.108677,4.10867 -2.885051,2.02051 c -2.276776,-0.17723 -6.045733,-2.46601 -9.613614,-6.03389 z" id="rect818" inkscape:connector-curvature="0" sodipodi:nodetypes="scccssscccs"></path> </g> </g></svg>
+                                <span> {{ phoneNumber }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <div class="menu">
             <div class="icon-logo-container">
                 <img src="../assets/images/logo.png" alt="Logo">
@@ -141,7 +160,9 @@ const newCalls = ref(0);  // Contador de nuevas llamadas
 const newMessages = ref(0);  // Contador de nuevos mensajes
 const store = useStore();  // Almacenamiento Vuex
 const alertsContainer = ref(null);  // Contenedor de alertas
-
+const modalContainer = ref(null);  // Contenedor de alertas
+const isModalVisible = ref(false)
+const phoneNumber = ref('');
 // CONFIGURACIÓN ANTES DE MONTAR EL DASHBOARD
 onBeforeMount(() => {
     // OBTENEMOS EL JWT ALMACENADO EN EL LOCAL-STORAGE
@@ -223,8 +244,28 @@ const newNotificationSeen = async (typeWidget: string) => {
     }
 }
 
+    const fetchBackendData = async () => {
+      try {
+        const callResponse = await store.dispatch('obtainRecordsTable', 'notifications')
+
+        if (callResponse && callResponse[0]?.llamadas > 0) {
+            isModalVisible.value = true
+            phoneNumber.value = callResponse[0].numero_call || '';
+        }
+        
+      } catch (error) {
+          console.error('Error al realizar la consulta al backend:', error);
+      }
+    };
+
+    setInterval(fetchBackendData, 5000);
+
+const onCloseCall = async () => {
+    await store.dispatch('editRecordTable', { "editRecord":  {"llamadas": 0}, "originalRecord": {llamadas: 0, id: 1, numero_call: ''}, "identifier": "id", "nameTable": "notifications" })
+    isModalVisible.value = false
+}
 // CONFIGURACIÓN NECESARIA LUEGO DE SER MONTADO EN LA APP
-onMounted(() => {
+onMounted(() => {    
     // FUNCIONALIDAD QUE VIGILA SI HUBO ALGÚN CAMBIO EN EL ESTADO 'alertMMessage'
     watch(() => store.state.alertMessage, () => {
         // OBTENEMOS EL NUEVO VALOR DE 'type' DEL ESTADO 'alertMMessage'
@@ -429,6 +470,69 @@ onMounted(() => {
     align-items: center;
 }
 
+.modal-container {
+    position: fixed;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    z-index: 1;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.modal-content {
+    width: 90%;
+    height: 80%;
+    border-radius: 20px;
+    background: #8dcfc2ce;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-body {
+    background: #fff;
+    position: relative;
+    width: 50%;
+    height: 50%;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-close {
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    background: #FF433D;
+    color: #fff;
+    display: flex;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+.modal-call p {
+    color: #32334F;
+    font-size: 25px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+.modal-call span {
+    color: #32334F;
+    font-size: 50px;
+}
+.modal-icon {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+}
 /* estilos para el contenedor de la información del usuario  */
 .info-user-container {
     width: 90%;
@@ -530,5 +634,6 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: -60px;
 }
 </style>

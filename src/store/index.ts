@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 
-const apiUrl = 'https://mysql-dashboard-api.onrender.com/';
+// const apiUrl = 'https://mysql-dashboard-api.onrender.com/';
+const apiUrl = 'http://127.0.0.1:3005/'
 
 const store = createStore({
   state: {

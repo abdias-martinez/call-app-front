@@ -10,12 +10,13 @@
                     <th :style="{ width: `${100 / (columns.length + 2)}%` }">BORRAR</th>
                 </thead>
                 <tbody>
-                    <tr v-for="(row, rowIndex) in data" :key="rowIndex"
+                    <tr v-for="(row, rowIndex) in localData" :key="rowIndex"
                         :class="{ 'even-row': rowIndex % 2 === 0, 'odd-row': rowIndex % 2 !== 0 }" :id="`row-${rowIndex}-${props.nameTable}`">
                         <td v-for="column in columns" :key="column">
                             <div class="centered-td-content">
                                 <input type="text" :value="row[column]" :class="`input-${props.nameTable}-row-${rowIndex}`"
-                                    :id="`input-${column.charAt(0).toUpperCase() + column.slice(1)}-row-${rowIndex}`" />
+                                    :id="`input-${column.charAt(0).toUpperCase() + column.slice(1)}-row-${rowIndex}`" 
+                                    :disabled="!editingRows.includes(rowIndex)" />
                             </div>
                         </td>
                         <td :class="`td-${rowIndex}`">
@@ -47,15 +48,17 @@
             </table>
         </div>
     </div>
-</template>  
+</template>
   
 <script setup>
-import { defineProps, ref, onBeforeMount, onMounted } from 'vue';
+import { defineProps, ref, onBeforeMount, onMounted, watch } from 'vue';
 import store from '@/store'
 const columns = ref();
 const additionalRows = ref([]);
 const numAdditionalRows = ref(0);
 let editRecord
+const editingRows = ref([]);
+const localData = ref([]);
 let deleteRecord
 const props = defineProps({
     data: {
@@ -81,9 +84,13 @@ const props = defineProps({
     identifier: {
         type: String,
         require: true
+    },
+    convertLow: {
+        type: Boolean
     }
 });
 onBeforeMount(() => {
+    localData.value = JSON.parse(JSON.stringify(props.data));
     columns.value = Object.keys(props.data[0])
     if (props.data.length < props.minRows) {
         numAdditionalRows.value = props.minRows - props.data.length
@@ -92,6 +99,20 @@ onBeforeMount(() => {
         }
     }
 })
+
+watch(() => props.data, (newData) => {
+    localData.value = JSON.parse(JSON.stringify(newData));
+});
+
+function convertKeysToLowerCase(obj) {
+    if(!props.convertLow) {
+        return obj
+    }
+    return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => [key.toLowerCase(), value])
+    );
+}
+
 onMounted(() => {
     const obtainValueInputsRecord = (rowIndex) => {
         const inputs = document.querySelectorAll(`.input-${props.nameTable}-row-${rowIndex}`)
@@ -105,6 +126,11 @@ onMounted(() => {
     }
 
     editRecord = async (rowIndex) => {
+        if (!editingRows.value.includes(rowIndex)) {
+            editingRows.value.push(rowIndex);
+            return;
+        }
+
         const dataEditedInputRecord = obtainValueInputsRecord(rowIndex)
         const recordsNameTable = await store.dispatch('obtainRecordsTable', props.nameTable)
         const dataOriginalInputRecord = recordsNameTable[rowIndex]
@@ -119,16 +145,19 @@ onMounted(() => {
             // OBTENEMOS LOS REGISTROS DEL OBJETO 'tablesObject'
             const records = tablesObject["CAE"][props.nameObject]["records"]
             // EDITAMOS EL REGISTRO
-            records[rowIndex] = dataEditedInputRecord
+            records[rowIndex] = convertKeysToLowerCase(dataEditedInputRecord)
             // ACTUALIZAMOS EL VALOR DEL JSON 'tables' ALMACENADO EN EL LOCAL-STORAGE
             localStorage.setItem('tables', JSON.stringify(tablesObject));
+
+            localData.value[rowIndex] = convertKeysToLowerCase(dataEditedInputRecord);
         }
+        editingRows.value = editingRows.value.filter(index => index !== rowIndex);
         store.state.loading = false
     }
 
     deleteRecord = async (rowIndex) => {
         const dataDeletedInputRecord = obtainValueInputsRecord(rowIndex)
-        const identifier = dataDeletedInputRecord[props.identifier]
+        const identifier = dataDeletedInputRecord[props.convertLow ? 'Id': props.identifier]
         await store.dispatch('deleteRecordTable', { "recordIdentifier": identifier, "identifier": props.identifier, "nameTable": props.nameTable })
         // OBTENEMOS EL JSON 'tables' ALMACENADO LOCAL-STORAGE
         const tables = localStorage.getItem('tables');
@@ -142,7 +171,9 @@ onMounted(() => {
             records.splice(rowIndex, 1);
             // ACTUALIZAMOS EL VALOR DEL JSON 'tables' ALMACENADO EN EL LOCAL-STORAGE
             localStorage.setItem('tables', JSON.stringify(tablesObject));
-
+            
+            localData.value = records;
+            
             store.state.rowDeleteEdit = true
         }
         store.state.loading = false
@@ -155,9 +186,7 @@ onMounted(() => {
 
 .table-1-container {
     width: 100%;
-    height: 100%;
     border-radius: .4rem .4rem;
-    display: flex;
     justify-content: center;
     overflow: hidden;
 }

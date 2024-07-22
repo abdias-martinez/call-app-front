@@ -151,6 +151,10 @@ const createInsertTableType3 = (colorHead: string, tableData: object, tableName:
             data: tableData,
             minRows: 9,
             color: colorHead,
+            urls: ['https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_18_dx7tlk.png', 'https://res.cloudinary.com/dimcnbuqs/image/upload/v1708724359/Vector_17_mrwof7.png'],
+            nameTable: tableName === 'Reporte_llamadas' ? 'calls_report' : '',
+            nameObject: tableName,
+            identifier: 'id'
         }
         // CREAMOS UNA INSTANCIA DEL COMPONENTE 'TableType3'
         const newTable = createApp(TableType3, propsData)
